@@ -44,3 +44,7 @@ def category(request, category_id):
         'category_list': category_list,
         'category': categoria,  # Pasar el objeto de categoría actual
     })
+
+def producto_detalle(request, id):
+    producto = get_object_or_404(Shop, id=id)
+    return render(request, 'Tienda/producto_detalle.html', {'producto': producto})
