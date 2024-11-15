@@ -5,8 +5,17 @@
 <div class="container py-5">
     <div class="row">
         <div class="col-lg-3">
-            <h1 class="h2 pb-4">Categories</h1>
-            <!-- Aquí van las categorías si las necesitas -->
+            <h1 class="h2 pb-4">Categorías</h1>
+            <!-- Filtro de categorías -->
+            <form method="get" action="{% url 'category' 0 %}">
+                <label for="category">Filtrar por categoría:</label>
+                <select name="category" id="category" class="form-select" onchange="window.location.href=this.value;">
+                    <option value="{% url 'producto' %}" {% if not category %}selected{% endif %}>Todas</option>
+                    {% for c in category_list %}
+                        <option value="{% url 'category' c.id %}" {% if category and category.id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
         </div>
 
         <div class="col-lg-9">
@@ -44,19 +53,19 @@
                         <ul class="pagination justify-content-end">
                             {% if page_obj.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if category %}&category={{ category }}{% endif %}" aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
                             {% endif %}
                             {% for num in page_obj.paginator.page_range %}
                                 <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    <a class="page-link" href="?page={{ num }}{% if category %}&category={{ category }}{% endif %}">{{ num }}</a>
                                 </li>
                             {% endfor %}
                             {% if page_obj.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if category %}&category={{ category }}{% endif %}" aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>

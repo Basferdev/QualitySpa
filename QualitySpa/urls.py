@@ -25,6 +25,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('producto/', viewsArticulos.producto, name='producto'),
+    path('category/<int:category_id>/', viewsArticulos.category, name='category'),
 ]
 
     
