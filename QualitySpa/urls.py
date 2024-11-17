@@ -34,10 +34,9 @@ urlpatterns = [
 
     # Rutas del vendedor
     path('dashboard/vendedor/', views.dashboard_vendedor, name='dashboard_vendedor'),
-    path('vendedor/revisar_cotizaciones/', views.revisar_cotizaciones, name='revisar_cotizaciones'),
-    path('vendedor/historial_cotizaciones/', views.historial_cotizaciones, name='historial_cotizaciones'),
-    path('vendedor/estadisticas_ventas/', views.estadisticas_ventas, name='estadisticas_ventas'),
-    
+    path('vendedor/cotizaciones/', views.revisar_cotizaciones, name='revisar_cotizaciones'),
+    path('vendedor/historial/', views.historial_cotizaciones, name='historial_cotizaciones'),
+    path('vendedor/estadisticas/', views.estadisticas_ventas, name='estadisticas_ventas'),
 ]
 
     

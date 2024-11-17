@@ -41,20 +41,24 @@
         </nav>
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-                {% block sidebar %}{% endblock %}
+                {% block sidebar %}
+                {% endblock %}
             </div>
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
                         <h1 class="mt-4">Dashboard</h1>
                         <!-- Tarjetas  -->
-                         {% block cards %}{% endblock %}
+                         {% block cards %}
+                         {% endblock %}
 
                         <!-- Gráficos -->
-                         {% block graphs %}{% endblock %}
+                         {% block graphs %}
+                         {% endblock %}
 
                         <!-- Tabla de datos -->
-                         {% block dataTables %}{% endblock %}
+                         {% block dataTables %}
+                         {% endblock %}
 
                     </div>
                 </main>

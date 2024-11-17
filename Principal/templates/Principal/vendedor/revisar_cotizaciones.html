@@ -1,0 +1,34 @@
+{% extends 'Principal/base_trabajadores.html' %}
+{% load static %}
+
+{% block sidebar %}
+<div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Gestión de Cotizaciones</div>
+                <a class="nav-link" href="{% url 'dashboard_vendedor' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    Dashboard
+                </a>
+                <a class="nav-link" href="{% url 'revisar_cotizaciones' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-file-invoice"></i></div>
+                    Cotizaciones Pendientes
+                </a>
+                <a class="nav-link" href="{% url 'historial_cotizaciones' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-history"></i></div>
+                    Historial de Cotizaciones
+                </a>
+                <a class="nav-link" href="{% url 'estadisticas_ventas' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-chart-bar"></i></div>
+                    Estadísticas de Ventas
+                </a>
+            </div>
+        </div>
+        <div class="sb-sidenav-footer">
+            <div class="small">Logged in as:</div>
+            {{ user.username }}
+        </div>
+    </nav>
+</div>
+{% endblock %}
