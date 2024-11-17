@@ -1,3 +1,157 @@
 {% extends 'Principal/base_trabajadores.html' %}
 {% load static %}
 
+{% block dashboard %}
+<a class="navbar-brand ps-3" href="{% url 'dashboard_admin' %}">Quality Spa</a>
+{% endblock %}
+
+{% block title %}
+<h1 class="mt-4">Dashboard</h1>
+{% endblock %}
+
+{% block sidebar %}
+<div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Gestión Administrativa</div>
+                <a class="nav-link" href="{% url 'dashboard_admin' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    Dashboard
+                </a>
+                <a class="nav-link" href="{% url 'gestionar_productos' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
+                    Gestionar Productos
+                </a>
+                <a class="nav-link" href="{% url 'gestionar_usuarios' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                    Gestionar Usuarios
+                </a>
+                <a class="nav-link" href="{% url 'ver_reportes' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-chart-line"></i></div>
+                    Ver Reportes
+                </a>
+            </div>
+        </div>
+        <div class="sb-sidenav-footer">
+            <div class="small">Logged in as:</div>
+            {{ user.username }}
+        </div>
+    </nav>
+</div>
+{% endblock %}
+
+{% block cards %}
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">Listado de Productos</div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'gestionar_productos' %}">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-warning text-white mb-4">
+            <div class="card-body">Usuarios</div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'gestionar_usuarios' %}">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-success text-white mb-4">
+            <div class="card-body">Reportes</div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'ver_reportes' %}">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-danger text-white mb-4">
+            <div class="card-body">Alertas</div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="#">View Details</a>
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Gráficos -->
+{% block graphs %}
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-area me-1"></i>
+                Gráfico de Productos por Categoría
+            </div>
+            <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-1"></i>
+                Gráfico de Nuevos Usuarios
+            </div>
+            <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Tabla de datos -->
+{% block dataTables %}
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        Resumen de Actividades
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>Actividad</th>
+                    <th>Responsable</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Actividad</th>
+                    <th>Responsable</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                </tr>
+            </tfoot>
+            <tbody>
+                <tr>
+                    <td>Creación de Producto</td>
+                    <td>Admin1</td>
+                    <td>2024-11-01</td>
+                    <td>Completado</td>
+                </tr>
+                <tr>
+                    <td>Edición de Usuario</td>
+                    <td>Admin2</td>
+                    <td>2024-11-10</td>
+                    <td>Pendiente</td>
+                </tr>
+                <tr>
+                    <td>Generación de Reporte</td>
+                    <td>Admin3</td>
+                    <td>2024-11-15</td>
+                    <td>Completado</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

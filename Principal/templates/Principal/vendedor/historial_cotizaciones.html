@@ -1,6 +1,14 @@
 {% extends 'Principal/base_trabajadores.html' %}
 {% load static %}
 
+{% block dashboard %}
+<a class="navbar-brand ps-3" href="{% url 'dashboard_vendedor' %}">Quality Spa</a>
+{% endblock %}
+
+{% block title %}
+<h1 class="mt-4">Historial de Cotizaciones</h1>
+{% endblock %}
+
 {% block sidebar %}
 <div id="layoutSidenav_nav">
     <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
@@ -30,5 +38,52 @@
             {{ user.username }}
         </div>
     </nav>
+</div>
+{% endblock %}
+
+{% block content1 %}
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-history me-1"></i>
+        Historial Completo
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>ID Cotización</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>ID Cotización</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                </tr>
+            </tfoot>
+            <tbody>
+                <tr>
+                    <td>#1234</td>
+                    <td>Juan Pérez</td>
+                    <td>2024-10-10</td>
+                    <td>Completada</td>
+                    <td>$1,500.00</td>
+                </tr>
+                <tr>
+                    <td>#1235</td>
+                    <td>María López</td>
+                    <td>2024-10-15</td>
+                    <td>Rechazada</td>
+                    <td>$2,000.00</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

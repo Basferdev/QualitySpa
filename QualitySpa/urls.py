@@ -28,18 +28,23 @@ urlpatterns = [
     path('category/<int:category_id>/', viewsArticulos.category, name='category'),
      # Rutas del administrador
     path('dashboard/admin/', views.dashboard_admin, name='dashboard_admin'),
-    path('admin/gestionar_productos/', views.gestionar_productos, name='gestionar_productos'),
-    path('admin/gestionar_usuarios/', views.gestionar_usuarios, name='gestionar_usuarios'),
-    path('admin/ver_reportes/', views.ver_reportes, name='ver_reportes'),
+    path('administrador/productos/', views.gestionar_productos, name='gestionar_productos'),
+    path('administrador/usuarios/', views.gestionar_usuarios, name='gestionar_usuarios'),
+    path('administrador/reportes/', views.ver_reportes, name='ver_reportes'),
 
     # Rutas del vendedor
     path('dashboard/vendedor/', views.dashboard_vendedor, name='dashboard_vendedor'),
     path('vendedor/cotizaciones/', views.revisar_cotizaciones, name='revisar_cotizaciones'),
     path('vendedor/historial/', views.historial_cotizaciones, name='historial_cotizaciones'),
     path('vendedor/estadisticas/', views.estadisticas_ventas, name='estadisticas_ventas'),
+
+    # Rutas de cotizaciones 
+    path('vendedor/revisar_cotizaciones/', views.revisar_cotizaciones, name='revisar_cotizaciones'),
+    path('cotizacion/aprobar/<int:id>/', views.aprobar_cotizacion, name='aprobar_cotizacion'),
+    path('cotizacion/rechazar/<int:id>/', views.rechazar_cotizacion, name='rechazar_cotizacion'),
+
 ]
 
-    
 if settings.DEBUG:
     from django.conf.urls.static import static
     urlpatterns += static(settings.MEDIA_URL,

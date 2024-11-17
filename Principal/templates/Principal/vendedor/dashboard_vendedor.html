@@ -1,6 +1,14 @@
 {% extends 'Principal/base_trabajadores.html' %}
 {% load static %}
 
+{% block dashboard %}
+<a class="navbar-brand ps-3" href="{% url 'dashboard_vendedor' %}">Quality Spa</a>
+{% endblock %}
+
+{% block title %}
+<h1 class="mt-4">Dashboard</h1>
+{% endblock %}
+
 {% block sidebar %}
 <div id="layoutSidenav_nav">
     <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
