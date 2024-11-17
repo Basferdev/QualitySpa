@@ -26,7 +26,18 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('producto/', viewsArticulos.producto, name='producto'),
     path('category/<int:category_id>/', viewsArticulos.category, name='category'),
-    path('producto/<int:id>/', viewsArticulos.producto_detalle, name='producto_detalle'),
+     # Rutas del administrador
+    path('dashboard/admin/', views.dashboard_admin, name='dashboard_admin'),
+    path('admin/gestionar_productos/', views.gestionar_productos, name='gestionar_productos'),
+    path('admin/gestionar_usuarios/', views.gestionar_usuarios, name='gestionar_usuarios'),
+    path('admin/ver_reportes/', views.ver_reportes, name='ver_reportes'),
+
+    # Rutas del vendedor
+    path('dashboard/vendedor/', views.dashboard_vendedor, name='dashboard_vendedor'),
+    path('vendedor/revisar_cotizaciones/', views.revisar_cotizaciones, name='revisar_cotizaciones'),
+    path('vendedor/historial_cotizaciones/', views.historial_cotizaciones, name='historial_cotizaciones'),
+    path('vendedor/estadisticas_ventas/', views.estadisticas_ventas, name='estadisticas_ventas'),
+    
 ]
 
     
