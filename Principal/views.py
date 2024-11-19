@@ -58,4 +58,3 @@ def aprobar_cotizacion(request, id):
 def rechazar_cotizacion(request, id):
     # Buscar cotización en base de datos y cambiar el estado a 'rechazada'
     return redirect('revisar_cotizaciones')
-

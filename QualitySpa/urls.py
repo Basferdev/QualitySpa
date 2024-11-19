@@ -26,6 +26,8 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('producto/', viewsArticulos.producto, name='producto'),
     path('category/<int:category_id>/', viewsArticulos.category, name='category'),
+    path('producto/<int:id>/', viewsArticulos.producto_detalle, name='producto_detalle'),
+    
      # Rutas del administrador
     path('dashboard/admin/', views.dashboard_admin, name='dashboard_admin'),
     path('administrador/productos/', views.gestionar_productos, name='gestionar_productos'),
