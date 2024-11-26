@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.shortcuts import render,get_object_or_404
 # Create your views here.
+
 from .models import Shop,Clasificacion
 def producto(request):
     # Obtener todos los productos

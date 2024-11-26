@@ -1,0 +1,54 @@
+{% extends 'trabajadores/base_trabajadores.html' %}
+{% load static %}
+
+{% block dashboard %}
+<a class="navbar-brand ps-3" href="{% url 'dashboard_admin' %}">Quality Spa</a>
+{% endblock %}
+
+{% block title %}
+<h1 class="mt-4">Reportes</h1>
+{% endblock %}
+
+{% block sidebar %}
+<div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Gestión Administrativa</div>
+                <a class="nav-link" href="{% url 'dashboard_admin' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    Dashboard
+                </a>
+                <a class="nav-link" href="{% url 'gestionar_productos' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
+                    Gestionar Productos
+                </a>
+                <a class="nav-link" href="{% url 'gestionar_usuarios' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                    Gestionar Usuarios
+                </a>
+                <a class="nav-link" href="{% url 'ver_reportes' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-chart-line"></i></div>
+                    Ver Reportes
+                </a>
+            </div>
+        </div>
+        <div class="sb-sidenav-footer">
+            <div class="small">Logged in as:</div>
+            {{ user.username }}
+        </div>
+    </nav>
+</div>
+{% endblock %}
+
+{% block content1 %}
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-chart-line me-1"></i>
+        Reportes Generados
+    </div>
+    <div class="card-body">
+        <p>Aquí se mostrarán los reportes generados de la tienda.</p>
+    </div>
+</div>
+{% endblock %}

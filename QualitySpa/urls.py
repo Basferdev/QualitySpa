@@ -18,6 +18,7 @@ from django.urls import path
 from Principal import views as views
 from django.conf import settings
 from Tienda import views as viewsArticulos
+from trabajadores import views as viewsTrabajadores
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,9 +28,26 @@ urlpatterns = [
     path('producto/', viewsArticulos.producto, name='producto'),
     path('category/<int:category_id>/', viewsArticulos.category, name='category'),
     path('producto/<int:id>/', viewsArticulos.producto_detalle, name='producto_detalle'),
+    
+     # Rutas del administrador
+    path('administrador/dashboard/', viewsTrabajadores.dashboard_admin, name='dashboard_admin'),
+    path('administrador/productos/', viewsTrabajadores.gestionar_productos, name='gestionar_productos'),
+    path('administrador/usuarios/', viewsTrabajadores.gestionar_usuarios, name='gestionar_usuarios'),
+    path('administrador/reportes/', viewsTrabajadores.ver_reportes, name='ver_reportes'),
+
+    # Rutas del vendedor
+    path('vendedor/dashboard/', viewsTrabajadores.dashboard_vendedor, name='dashboard_vendedor'),
+    path('vendedor/cotizaciones/', viewsTrabajadores.revisar_cotizaciones, name='revisar_cotizaciones'),
+    path('vendedor/historial/', viewsTrabajadores.historial_cotizaciones, name='historial_cotizaciones'),
+    path('vendedor/estadisticas/', viewsTrabajadores.estadisticas_ventas, name='estadisticas_ventas'),
+
+    # Rutas de cotizaciones 
+    path('vendedor/revisar_cotizaciones/', viewsTrabajadores.revisar_cotizaciones, name='revisar_cotizaciones'),
+    path('cotizacion/aprobar/<int:id>/', viewsTrabajadores.aprobar_cotizacion, name='aprobar_cotizacion'),
+    path('cotizacion/rechazar/<int:id>/', viewsTrabajadores.rechazar_cotizacion, name='rechazar_cotizacion'),
+
 ]
 
-    
 if settings.DEBUG:
     from django.conf.urls.static import static
     urlpatterns += static(settings.MEDIA_URL,
