@@ -27,7 +27,14 @@
                             <div class="card-img-overlay rounded-0 product-overlay d-flex align-items-center justify-content-center">
                                 <ul class="list-unstyled">
                                     <li><a class="btn btn-success text-white" href="#"><i class="far fa-heart"></i></a></li>
-                                    <li><a class="btn btn-success text-white mt-2" href="#"><i class="fas fa-cart-plus"></i></a></li>
+                                    <li>
+                                        <form action="{% url 'agregar_al_carrito' product.id %}" method="post" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success text-white mt-2">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        </form>
+                                    </li>
                                     <!-- Modificado: Redirigir al detalle del producto -->
                                     <li><a class="btn btn-success text-white mt-3" href="{% url 'producto_detalle' product.id %}"><i class="far fa-eye"></i></a></li>
                                 </ul>

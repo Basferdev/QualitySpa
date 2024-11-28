@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'tienda/style.css' %}">
+</head>
+<body>
+
+    <h1>Carrito de Compras</h1>
+
+    <!-- Mostrar mensaje de éxito o error -->
+    {% if messages %}
+        <div class="alert">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if carrito %}
+        <div class="productos-carrito">
+            <ul>
+                {% for producto_id, detalles in carrito.items %}
+                    <li>
+                        <div>
+                            <h3>{{ detalles.titulo }}</h3>
+                            <p>Precio: ${{ detalles.precio }}</p>
+                            <p>Cantidad: {{ detalles.cantidad }}</p>
+                        </div>
+
+                        <!-- Botón para eliminar producto del carrito -->
+                        <form action="{% url 'eliminar_del_carrito' producto_id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-eliminar">Eliminar</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Mostrar el total de los productos en el carrito -->
+        <div class="total-carrito">
+            <p><strong>Total de productos:</strong> {{ total_productos }}</p>
+            <p><strong>Total a pagar:</strong> ${{ total_precio }}</p>
+        </div>
+    {% else %}
+        <p>Tu carrito está vacío.</p>
+    {% endif %}
+
+    <!-- Opciones adicionales, como el botón para hacer cotización -->
+    <a href="{% url 'producto' %}" class="btn-cotizacion">Volver al a tienda</a>
+    {% if user.is_authenticated %}
+    <form action="#" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn-realizar-pedido">Realizar Pedido</button>
+    </form>
+{% else %}
+    <p>Debes <a href="#">iniciar sesión</a> para realizar un pedido.</p>
+{% endif %}
+
+</body>
+</html>

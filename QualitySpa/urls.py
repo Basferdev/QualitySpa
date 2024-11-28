@@ -28,6 +28,9 @@ urlpatterns = [
     path('producto/', viewsArticulos.producto, name='producto'),
     path('category/<int:category_id>/', viewsArticulos.category, name='category'),
     path('producto/<int:id>/', viewsArticulos.producto_detalle, name='producto_detalle'),
+    path('agregar-al-carrito/<int:producto_id>/', viewsArticulos.agregar_al_carrito, name='agregar_al_carrito'),
+    path('carrito/', viewsArticulos.ver_carrito, name='ver_carrito'),
+    path('eliminar-del-carrito/<int:producto_id>/', viewsArticulos.eliminar_del_carrito, name='eliminar_del_carrito'),
     
      # Rutas del administrador
     path('administrador/dashboard/', viewsTrabajadores.dashboard_admin, name='dashboard_admin'),

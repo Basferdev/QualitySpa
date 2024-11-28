@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.shortcuts import render,get_object_or_404
+from django.contrib import messages
 # Create your views here.
 
 from .models import Shop,Clasificacion
@@ -49,3 +50,72 @@ def category(request, category_id):
 def producto_detalle(request, id):
     producto = get_object_or_404(Shop, id=id)
     return render(request, 'Tienda/producto_detalle.html', {'producto': producto})
+
+def agregar_al_carrito(request, producto_id):
+    try:
+        # Obtener el producto desde la base de datos
+        producto = Shop.objects.get(id=producto_id)
+    except Shop.DoesNotExist:
+        messages.error(request, "El producto no existe.")
+        return redirect('lista_productos')
+
+    # Verificar si hay stock disponible
+    if producto.stock <= 0:
+        messages.error(request, f'El producto "{producto.title}" no tiene stock disponible.')
+        return redirect(request.META.get('HTTP_REFERER', 'lista_productos'))
+
+    # Obtener el carrito desde la sesión (o uno vacío si no existe)
+    carrito = request.session.get('carrito', {})
+
+    # Convertir el precio de Decimal a float
+    precio_producto = float(producto.price)
+
+    # Si el producto ya está en el carrito, verificar stock antes de incrementar cantidad
+    if str(producto.id) in carrito:
+        if carrito[str(producto.id)]['cantidad'] < producto.stock:
+            carrito[str(producto.id)]['cantidad'] += 1
+        else:
+            messages.error(request, f'No puedes agregar más unidades de "{producto.title}". Stock insuficiente.')
+            return redirect(request.META.get('HTTP_REFERER', 'lista_productos'))
+    else:
+        # Si no está en el carrito, agregarlo si hay stock
+        carrito[str(producto.id)] = {
+            'titulo': producto.title,
+            'precio': precio_producto,
+            'cantidad': 1
+        }
+
+    # Guardar el carrito actualizado en la sesión
+    request.session['carrito'] = carrito
+
+    # Calcular el total de productos en el carrito (suma de todas las cantidades)
+    total_productos = sum(item['cantidad'] for item in carrito.values())
+
+    # Agregar el total de productos al contexto de la sesión
+    request.session['total_productos'] = total_productos
+
+    # Mensaje de éxito
+    messages.success(request, f'El producto "{producto.title}" se ha añadido al carrito.')
+
+    # Redirigir al usuario a la página anterior
+    return redirect(request.META.get('HTTP_REFERER', 'lista_productos'))
+
+# Ver carrito
+def ver_carrito(request):
+    carrito = request.session.get('carrito', {})
+    total_precio = sum(item['precio'] * item['cantidad'] for item in carrito.values())
+    return render(request, 'Tienda/carrito.html', {
+        'carrito': carrito,
+        'total_precio': total_precio,
+        'total_productos': sum(item['cantidad'] for item in carrito.values()),
+    })
+
+# Eliminar del carrito
+def eliminar_del_carrito(request, producto_id):
+    carrito = request.session.get('carrito', {})
+    if str(producto_id) in carrito:
+        del carrito[str(producto_id)]
+        request.session['carrito'] = carrito
+        request.session['total_productos'] = sum(item['cantidad'] for item in carrito.values())
+        messages.success(request, "El producto ha sido eliminado del carrito.")
+    return redirect('ver_carrito')
