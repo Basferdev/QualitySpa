@@ -1,0 +1,27 @@
+{% extends 'Principal/base.html' %}
+
+{% block content1 %}
+<div class="container py-5">
+    <h2>Registro de Clientes</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_username" class="form-label">Nombre de usuario</label>
+            <input type="text" name="username" class="form-control" id="id_username" required>
+        </div>
+        <div class="mb-3">
+            <label for="id_email" class="form-label">Correo electrónico</label>
+            <input type="email" name="email" class="form-control" id="id_email" required>
+        </div>
+        <div class="mb-3">
+            <label for="id_password" class="form-label">Contraseña</label>
+            <input type="password" name="password" class="form-control" id="id_password" required>
+        </div>
+        <div class="mb-3">
+            <label for="id_password_confirm" class="form-label">Confirmar Contraseña</label>
+            <input type="password" name="password_confirm" class="form-control" id="id_password_confirm" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrarse</button>
+    </form>
+</div>
+{% endblock %}
