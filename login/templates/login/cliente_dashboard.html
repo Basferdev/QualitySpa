@@ -1,0 +1,12 @@
+{% extends 'Principal/base.html' %}
+
+{% block content1 %}
+<h2>Bienvenido, {{ user.username }}</h2>
+<p>Esta sección es exclusiva para clientes.</p>
+
+<h3>Tus Opciones</h3>
+<ul>
+    <li><a href="#">Ver Productos</a></li>
+    <li><a href="#">Ver Tus Cotizaciones</a></li>
+</ul>
+{% endblock %}

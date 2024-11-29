@@ -13,7 +13,7 @@
     
     <link rel="stylesheet" href="{% static 'Principal/css/templatemo.css' %}">
     <link rel="stylesheet" href=" {% static 'Principal/css/custom.css' %}">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'Principal/css/style.css' %}">
     <!-- Load fonts style after rendering the layout styles -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
     
@@ -103,17 +103,31 @@ https://templatemo.com/tm-559-zay-shop
                             </div>
                         </div>
                     </div>
+
                     <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
                         <i class="fa fa-fw fa-search text-dark mr-2"></i>
                     </a>
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
+                    <!-- Ícono del carrito: redirige según el estado de sesión -->
+                    <a class="nav-icon position-relative text-decoration-none" href="{% if user.is_authenticated %}{% url 'carrito' %}{% else %}{% url 'login' %}{% endif %}">
                         <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
                         <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
                     </a>
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
+                    <!-- Ícono de registro: visible solo si el usuario no ha iniciado sesión -->
+                    {% if not user.is_authenticated %}
+                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'register' %}">
                         <i class="fa fa-fw fa-user text-dark mr-3"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">+99</span>
                     </a>
+                    {% endif %}
+                    <!-- Ícono de inicio de sesión o logout: según el estado de sesión -->
+                    {% if user.is_authenticated %}
+                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'logout' %}">
+                        <i class="fa fa-fw fa-sign-out-alt text-dark mr-3"></i>
+                    </a>
+                    {% else %}
+                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'login' %}">
+                        <i class="fa fa-fw fa-sign-in-alt text-dark mr-3"></i>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
 
