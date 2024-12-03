@@ -44,12 +44,6 @@ urlpatterns = [
 
     
     path('carrito/update', viewsArticulos.update_cart, name='update_cart'),
-    
-     # Rutas del administrador
-    path('administrador/dashboard/', viewsTrabajadores.dashboard_admin, name='dashboard_admin'),
-    path('administrador/productos/', viewsTrabajadores.gestionar_productos, name='gestionar_productos'),
-    path('administrador/usuarios/', viewsTrabajadores.gestionar_usuarios, name='gestionar_usuarios'),
-    path('administrador/reportes/', viewsTrabajadores.ver_reportes, name='ver_reportes'),
 
     # Rutas del vendedor
     path('vendedor/dashboard/', viewsTrabajadores.dashboard_vendedor, name='dashboard_vendedor'),
@@ -67,7 +61,6 @@ urlpatterns = [
     path('register/', viewsLogin.register, name='register'),  # Ruta para el registro
     path('login/', viewsLogin.user_login, name='login'),  # Ruta para el login
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
-
 
 ]
 
