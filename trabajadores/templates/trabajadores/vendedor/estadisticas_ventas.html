@@ -36,6 +36,7 @@
         <div class="sb-sidenav-footer">
             <div class="small">Logged in as:</div>
             {{ user.username }}
+            <a href="{% url 'vendedor_logout' %}" class="dropdown-item">Logout</a>
         </div>
     </nav>
 </div>
