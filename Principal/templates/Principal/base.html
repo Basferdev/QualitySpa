@@ -6,25 +6,15 @@
     <title>Quality Spa</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <link rel="apple-touch-icon" href="{% static 'Principal/img/apple-icon.png' %} ">
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'Principal/img/img/favicon.ico' %} ">
+
+    <link rel="apple-touch-icon" href="{% static 'Principal/img/apple-icon.png' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'Principal/img/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'Principal/css/bootstrap.min.css' %}">
-    
     <link rel="stylesheet" href="{% static 'Principal/css/templatemo.css' %}">
-    <link rel="stylesheet" href=" {% static 'Principal/css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'Principal/css/custom.css' %}">
     <link rel="stylesheet" href="{% static 'Principal/css/style.css' %}">
-    <!-- Load fonts style after rendering the layout styles -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
-    
     <link rel="stylesheet" href="{% static 'Principal/css/fontawesome.min.css' %}">
-<!--
-    
-TemplateMo 559 Zay Shop
-
-https://templatemo.com/tm-559-zay-shop
-
--->
 </head>
 
 <body>
@@ -47,37 +37,19 @@ https://templatemo.com/tm-559-zay-shop
             </div>
         </div>
     </nav>
-    <div class="modal fade bg-white" id="templatemo_search" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="w-100 pt-1 mb-5 text-right">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="" method="get" class="modal-content modal-body border-0 p-0">
-                <div class="input-group mb-2">
-                    <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="Search ...">
-                    <button type="submit" class="input-group-text bg-success text-light">
-                        <i class="fa fa-fw fa-search text-white"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
     <!-- Close Top Nav -->
-
 
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-light shadow">
         <div class="container d-flex justify-content-between align-items-center">
-
             <a class="navbar-brand text-success logo h1 align-self-center" href="/">
                 Quality Spa
             </a>
-
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
+            <div class="align-self-center collapse navbar-collapse flex-fill d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
                 <div class="flex-fill">
                     <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
                         <li class="nav-item">
@@ -95,38 +67,29 @@ https://templatemo.com/tm-559-zay-shop
                     </ul>
                 </div>
                 <div class="navbar align-self-center d-flex">
-                    <div class="d-lg-none flex-sm-fill mt-3 mb-4 col-7 col-sm-auto pr-3">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="inputMobileSearch" placeholder="Search ...">
-                            <div class="input-group-text">
-                                <i class="fa fa-fw fa-search"></i>
-                            </div>
-                            <a href="#"></a>
-                        </div>
-                    </div>
-
+                    <!-- Búsqueda -->
                     <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
                         <i class="fa fa-fw fa-search text-dark mr-2"></i>
                     </a>
-                    <a href="{% url 'ver_carrito' %}" target="_blank" class="btn-carrito nav-icon position-relative text-decoration-none">
+
+                    <!-- Carrito -->
+                    <a href="{% url 'ver_carrito' %}" class="btn-carrito nav-icon position-relative text-decoration-none">
                         <i class="fa fa-fw fa-shopping-cart text-dark mr-1"></i>
                         <span id="cart-count" class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">
-                            {% if request.session.total_productos %}
-                                {{ request.session.total_productos }}
-                            {% else %}
-                                0
-                            {% endif %}
+                            {% if request.session.total_productos %} {{ request.session.total_productos }} {% else %} 0 {% endif %}
                         </span>
                     </a>
-                    <!-- Ícono de registro: visible solo si el usuario no ha iniciado sesión -->
+
+                    <!-- Registro para clientes -->
                     {% if not user.is_authenticated %}
                     <a class="nav-icon position-relative text-decoration-none" href="{% url 'register' %}">
                         <i class="fa fa-fw fa-user text-dark mr-3"></i>
                     </a>
                     {% endif %}
-                    <!-- Ícono de inicio de sesión o logout: según el estado de sesión -->
+
+                    <!-- Inicio de sesión o logout para clientes -->
                     {% if user.is_authenticated %}
-                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'logout' %}">
+                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'cliente_logout' %}">
                         <i class="fa fa-fw fa-sign-out-alt text-dark mr-3"></i>
                     </a>
                     {% else %}
@@ -134,27 +97,32 @@ https://templatemo.com/tm-559-zay-shop
                         <i class="fa fa-fw fa-sign-in-alt text-dark mr-3"></i>
                     </a>
                     {% endif %}
+
+                    <!-- Login exclusivo para trabajadores -->
+                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'trabajador_login' %}">
+                        <i class="fa fa-fw fa-user-tie text-dark mr-3"></i>
+                    </a>
+
+                    
                 </div>
             </div>
-
         </div>
     </nav>
     <!-- Close Header -->
-    {% block content1 %}
 
+    {% block content1 %}
     {% endblock %}
 
-    <!-- Start Footer -->
+    <!-- Footer -->
     <footer class="bg-dark" id="tempaltemo_footer">
         <div class="container">
             <div class="row">
-
-                <div class="col-md-4 pt-5" id="coso">
+                <div class="col-md-4 pt-5">
                     <h2 class="h2 text-success border-bottom pb-3 border-light logo">Quality Spa</h2>
                     <ul class="list-unstyled text-light footer-link-list">
                         <li>
                             <i class="fas fa-map-marker-alt fa-fw"></i>
-                            Bio Bio , Concepcion, El carmen 1477
+                            Bio Bio, Concepcion, El Carmen 1477
                         </li>
                         <li>
                             <i class="fa fa-phone fa-fw"></i>
@@ -170,12 +138,12 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="col-md-4 pt-5">
                     <h2 class="h2 text-light border-bottom pb-3 border-light">Products</h2>
                     <ul class="list-unstyled text-light footer-link-list">
-                        <li><a class="text-decoration-none" href="#">Lapices</a></li>
+                        <li><a class="text-decoration-none" href="#">Lápices</a></li>
                         <li><a class="text-decoration-none" href="#">Herramientas</a></li>
                         <li><a class="text-decoration-none" href="#">Muebles</a></li>
-                        <li><a class="text-decoration-none" href="#">Articulos de limpieza</a></li>
-                        <li><a class="text-decoration-none" href="#">Articulos de ofiscina</a></li>
-                        <li><a class="text-decoration-none" href="#">Didacticos</a></li>
+                        <li><a class="text-decoration-none" href="#">Artículos de limpieza</a></li>
+                        <li><a class="text-decoration-none" href="#">Artículos de oficina</a></li>
+                        <li><a class="text-decoration-none" href="#">Didácticos</a></li>
                         <li><a class="text-decoration-none" href="#">Varios</a></li>
                     </ul>
                 </div>
@@ -187,79 +155,18 @@ https://templatemo.com/tm-559-zay-shop
                         <li><a class="text-decoration-none" href="/about/">About Us</a></li>
                         <li><a class="text-decoration-none" href="/contact/">Shop Locations</a></li>
                         <li><a class="text-decoration-none" href="/contact/">FAQs</a></li>
-                        <li><a class="text-decoration-none" href="#coso">Contact</a></li>
+                        <li><a class="text-decoration-none" href="#">Contact</a></li>
                     </ul>
-                </div>
-
-            </div>
-
-            <div class="row text-light mb-4">
-                <div class="col-12 mb-3">
-                    <div class="w-100 my-3 border-top border-light"></div>
-                </div>
-                <div class="col-auto me-auto">
-                    <ul class="list-inline text-left footer-icons">
-                        <li class="list-inline-item border border-light rounded-circle text-center">
-                            <a class="text-light text-decoration-none" target="_blank" href="http://facebook.com/"><i class="fab fa-facebook-f fa-lg fa-fw"></i></a>
-                        </li>
-                        <li class="list-inline-item border border-light rounded-circle text-center">
-                            <a class="text-light text-decoration-none" target="_blank" href="https://www.instagram.com/"><i class="fab fa-instagram fa-lg fa-fw"></i></a>
-                        </li>
-                        <li class="list-inline-item border border-light rounded-circle text-center">
-                            <a class="text-light text-decoration-none" target="_blank" href="https://twitter.com/"><i class="fab fa-twitter fa-lg fa-fw"></i></a>
-                        </li>
-                        <li class="list-inline-item border border-light rounded-circle text-center">
-                            <a class="text-light text-decoration-none" target="_blank" href="https://www.linkedin.com/"><i class="fab fa-linkedin fa-lg fa-fw"></i></a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-auto">
-                    <label class="sr-only" for="subscribeEmail">Email address</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control bg-dark border-light" id="subscribeEmail" placeholder="Email address">
-                        <div class="input-group-text btn-success text-light">Subscribe</div>
-                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="w-100 bg-black py-3">
-            <div class="container">
-                <div class="row pt-2">
-                    <div class="col-12">
-                        <p class="text-left text-light">
-                            Copyright Quality spa 2024 company
-                            | Designed by Darkade
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </footer>
     <!-- End Footer -->
 
-    <!-- Start Script -->
-    <script src="{% static 'Principal/js/jquery-1.11.0.min.jss' %}"></script>
-    <script src="{% static 'Principal/js/jquery-migrate-1.2.1.min.js' %}"></script>
+    <!-- Scripts -->
+    <script src="{% static 'Principal/js/jquery-1.11.0.min.js' %}"></script>
     <script src="{% static 'Principal/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'Principal/js/templatemo.js' %}"></script>
     <script src="{% static 'Principal/js/custom.js' %}"></script>
-    <script>
-        // Actualizar el carrito después de agregar o eliminar productos
-        function updateCartCount() {
-            // Realiza una solicitud AJAX para obtener el número de productos en el carrito
-            fetch('/carrito/update')  // Esta URL debería ser una vista que devuelva el número de productos en el carrito
-                .then(response => response.json())
-                .then(data => {
-                    // Actualiza el contador del carrito con la cantidad de productos
-                    const cartCountElement = document.getElementById('cart-count');
-                    cartCountElement.textContent = data.total_productos || 0;
-                })
-                .catch(error => console.error('Error al actualizar el carrito:', error));
-        }
-    </script>
-    <!-- End Script -->
 </body>
-
 </html>

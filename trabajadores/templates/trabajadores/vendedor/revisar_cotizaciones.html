@@ -1,12 +1,11 @@
 {% extends 'trabajadores/base_trabajadores.html' %}
-{% load static %}
 
 {% block dashboard %}
 <a class="navbar-brand ps-3" href="{% url 'dashboard_vendedor' %}">Quality Spa</a>
 {% endblock %}
 
 {% block title %}
-<h1 class="mt-4">Cotizaciones</h1>
+<h1 class="mt-4">Cotizaciones Pendientes</h1>
 {% endblock %}
 
 {% block sidebar %}
@@ -19,7 +18,7 @@
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Dashboard
                 </a>
-                <a class="nav-link" href="{% url 'revisar_cotizaciones' %}">
+                <a class="nav-link active" href="{% url 'revisar_cotizaciones' %}">
                     <div class="sb-nav-link-icon"><i class="fas fa-file-invoice"></i></div>
                     Cotizaciones Pendientes
                 </a>
@@ -36,72 +35,50 @@
         <div class="sb-sidenav-footer">
             <div class="small">Logged in as:</div>
             {{ user.username }}
+            <a href="{% url 'vendedor_logout' %}" class="dropdown-item">Logout</a>
         </div>
     </nav>
 </div>
 {% endblock %}
 
 {% block content1 %}
-<div class="card mb-4">
-    <div class="card-header">
-        <i class="fas fa-file-invoice me-1"></i>
-        Listado de Cotizaciones
-    </div>
-    <div class="card-body">
-        <table id="datatablesSimple">
-            <thead>
-                <tr>
-                    <th>ID Cotización</th>
-                    <th>Cliente</th>
-                    <th>Fecha</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr>
-                    <th>ID Cotización</th>
-                    <th>Cliente</th>
-                    <th>Fecha</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </tfoot>
-            <tbody>
-                <!-- Aquí puedes iterar sobre las cotizaciones -->
-                {% for cotizacion in cotizaciones %}
-                <tr>
-                    <td>{{ cotizacion.id }}</td>
-                    <td>{{ cotizacion.cliente }}</td>
-                    <td>{{ cotizacion.fecha }}</td>
-                    <td>${{ cotizacion.total }}</td>
-                    <td>
-                        {% if cotizacion.estado == 'pendiente' %}
-                        <span class="badge bg-warning">Pendiente</span>
-                        {% elif cotizacion.estado == 'aceptada' %}
-                        <span class="badge bg-success">Aceptada</span>
-                        {% elif cotizacion.estado == 'rechazada' %}
-                        <span class="badge bg-danger">Rechazada</span>
-                        {% else %}
-                        <span class="badge bg-secondary">Desconocido</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if cotizacion.estado == 'pendiente' %}
-                        <a href="{% url 'aprobar_cotizacion' cotizacion.id %}" class="btn btn-success btn-sm">Aprobar</a>
-                        <a href="{% url 'rechazar_cotizacion' cotizacion.id %}" class="btn btn-danger btn-sm">Rechazar</a>
-                        {% elif cotizacion.estado == 'aceptada' %}
-                        <a href="#" class="btn btn-secondary btn-sm" disabled>Finalizada</a>
-                        {% else %}
-                        <a href="#" class="btn btn-secondary btn-sm" disabled>No disponible</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="container mt-4">
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Lista de Cotizaciones Pendientes
+        </div>
+        <div class="card-body">
+            <table id="datatablesSimple">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cotizacion in cotizaciones %}
+                    <tr>
+                        <td>{{ cotizacion.id }}</td>
+                        <td>{{ cotizacion.cliente }}</td>
+                        <td>{{ cotizacion.fecha }}</td>
+                        <td>${{ cotizacion.total }}</td>
+                        <td>
+                            <a href="{% url 'aprobar_cotizacion' cotizacion.id %}" class="btn btn-success btn-sm">Aprobar</a>
+                            <a href="{% url 'rechazar_cotizacion' cotizacion.id %}" class="btn btn-danger btn-sm">Rechazar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay cotizaciones pendientes.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}
