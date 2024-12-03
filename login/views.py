@@ -10,28 +10,32 @@ def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            # Crear el usuario
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
-            user.save()
-            
-            # Crear el perfil de usuario
-            UserProfile.objects.create(
-                user=user,
-                phone_number=form.cleaned_data['phone_number'],
-                address=form.cleaned_data['address'],
-                postal_code=form.cleaned_data['postal_code']
-            )
-            
-            # Asignar al grupo 'clientes'
-            group = Group.objects.get(name='clientes')
-            user.groups.add(group)
-            
-            # Autenticar automáticamente
-            login(request, user)
-            return redirect('cliente_dashboard')  # Cambia a la URL de tu dashboard de clientes
+            try:
+                # Crear el usuario
+                user = form.save(commit=False)
+                user.set_password(form.cleaned_data['password'])
+                user.first_name = form.cleaned_data['first_name']
+                user.last_name = form.cleaned_data['last_name']
+                user.save()
+                
+                # Crear el perfil de usuario
+                UserProfile.objects.create(
+                    user=user,
+                    phone_number=form.cleaned_data['phone_number'],
+                    address=form.cleaned_data['address'],
+                    postal_code=form.cleaned_data['postal_code']
+                )
+                
+                # Asignar al grupo 'clientes'
+                group = Group.objects.get(name='clientes')
+                user.groups.add(group)
+                
+                # Autenticar automáticamente
+                login(request, user)
+                return redirect('cliente_dashboard')  # Cambia a la URL de tu dashboard de clientes
+            except Exception as e:
+                # En caso de un error inesperado
+                form.add_error(None, f"Ocurrió un error al procesar el registro: {str(e)}")
     else:
         form = RegistrationForm()
     return render(request, 'login/register.html', {'form': form})
