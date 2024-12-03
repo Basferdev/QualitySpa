@@ -4,26 +4,14 @@ from django.contrib.auth import login, authenticate
 from .forms import RegistrationForm, LoginForm
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
-from .models import UserProfile
 
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            # Crear el usuario
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
             user.save()
-            
-            # Crear el perfil de usuario
-            UserProfile.objects.create(
-                user=user,
-                phone_number=form.cleaned_data['phone_number'],
-                address=form.cleaned_data['address'],
-                postal_code=form.cleaned_data['postal_code']
-            )
             
             # Asignar al grupo 'clientes'
             group = Group.objects.get(name='clientes')
@@ -31,10 +19,11 @@ def register(request):
             
             # Autenticar automáticamente
             login(request, user)
-            return redirect('cliente_dashboard')  # Cambia a la URL de tu dashboard de clientes
+            return redirect('cliente_dashboard')  # Redirigir al dashboard del cliente
     else:
         form = RegistrationForm()
     return render(request, 'login/register.html', {'form': form})
+
 
 
 @login_required
@@ -48,6 +37,8 @@ def cliente_dashboard(request):
 
     # Lógica específica para clientes (puedes cargar datos relacionados aquí)
     return render(request, 'login/cliente_dashboard.html')
+
+
 
 def user_login(request):
     if request.method == 'POST':

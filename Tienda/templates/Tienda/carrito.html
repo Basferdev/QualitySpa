@@ -1,9 +1,16 @@
-{% extends 'Principal/base.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'tienda/style.css' %}">
+</head>
+<body>
 
-{% block content1 %}
-<div class="container py-5">
     <h1>Carrito de Compras</h1>
+
     <!-- Mostrar mensaje de éxito o error -->
     {% if messages %}
         <div class="alert">
@@ -53,7 +60,6 @@
 {% else %}
     <p>Debes <a href="#">iniciar sesión</a> para realizar un pedido.</p>
 {% endif %}
+
 </body>
-</div>
-{% endblock %}
 </html>
