@@ -2,19 +2,6 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 
-# Vistas del administrador
-def dashboard_admin(request):
-    return render(request, 'trabajadores/administrador/dashboard_admin.html')
-
-def gestionar_productos(request):
-    return render(request, 'trabajadores/administrador/gestionar_productos.html')
-
-def gestionar_usuarios(request):
-    return render(request, 'trabajadores/administrador/gestionar_usuarios.html')
-
-def ver_reportes(request):
-    return render(request, 'trabajadores/administrador/ver_reportes.html')
-
 # Vistas del vendedor
 def dashboard_vendedor(request):
     return render(request, 'trabajadores/vendedor/dashboard_vendedor.html')
