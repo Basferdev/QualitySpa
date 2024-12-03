@@ -108,13 +108,15 @@ https://templatemo.com/tm-559-zay-shop
                     <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
                         <i class="fa fa-fw fa-search text-dark mr-2"></i>
                     </a>
-                    <a href="{% url 'ver_carrito' %}" class="btn-carrito nav-icon position-relative text-decoration-none">
+                    <a href="{% url 'ver_carrito' %}" target="_blank" class="btn-carrito nav-icon position-relative text-decoration-none">
                         <i class="fa fa-fw fa-shopping-cart text-dark mr-1"></i>
-                        {% if request.session.total_productos %}
-                            <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">{{ request.session.total_productos }}</span>
-                        {% else %}
-                            <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">0</span>
-                        {% endif %}
+                        <span id="cart-count" class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">
+                            {% if request.session.total_productos %}
+                                {{ request.session.total_productos }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
                     </a>
                     <!-- Ícono de registro: visible solo si el usuario no ha iniciado sesión -->
                     {% if not user.is_authenticated %}
@@ -243,6 +245,20 @@ https://templatemo.com/tm-559-zay-shop
     <script src="{% static 'Principal/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'Principal/js/templatemo.js' %}"></script>
     <script src="{% static 'Principal/js/custom.js' %}"></script>
+    <script>
+        // Actualizar el carrito después de agregar o eliminar productos
+        function updateCartCount() {
+            // Realiza una solicitud AJAX para obtener el número de productos en el carrito
+            fetch('/carrito/update')  // Esta URL debería ser una vista que devuelva el número de productos en el carrito
+                .then(response => response.json())
+                .then(data => {
+                    // Actualiza el contador del carrito con la cantidad de productos
+                    const cartCountElement = document.getElementById('cart-count');
+                    cartCountElement.textContent = data.total_productos || 0;
+                })
+                .catch(error => console.error('Error al actualizar el carrito:', error));
+        }
+    </script>
     <!-- End Script -->
 </body>
 

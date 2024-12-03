@@ -11,7 +11,7 @@ Class-based views
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls')).
 """
 from django.contrib import admin
 from django.urls import path, include
@@ -23,16 +23,27 @@ from login import views as viewsLogin
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
+
+    # Rutas de la aplicación
+
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('producto/', viewsArticulos.producto, name='producto'),
     path('category/<int:category_id>/', viewsArticulos.category, name='category'),
+    
+    # Rutas Carrito
+
+    path('carrito/restar/<int:producto_id>/', viewsArticulos.restar_cantidad, name='restar_cantidad'),
+    path('carrito/sumar/<int:producto_id>/', viewsArticulos.sumar_cantidad, name='sumar_cantidad'),
     path('producto/<int:id>/', viewsArticulos.producto_detalle, name='producto_detalle'),
     path('agregar-al-carrito/<int:producto_id>/', viewsArticulos.agregar_al_carrito, name='agregar_al_carrito'),
     path('carrito/', viewsArticulos.ver_carrito, name='ver_carrito'),
     path('eliminar-del-carrito/<int:producto_id>/', viewsArticulos.eliminar_del_carrito, name='eliminar_del_carrito'),
+
+    
+    path('carrito/update', viewsArticulos.update_cart, name='update_cart'),
     
      # Rutas del administrador
     path('administrador/dashboard/', viewsTrabajadores.dashboard_admin, name='dashboard_admin'),
