@@ -137,3 +137,4 @@ EMAIL_HOST_USER= 'correopruebaquality1@gmail.com'
 EMAIL_HOST_PASSWORD='xdbjfqcqknciblme'
 EMAIL_USE_TLS= True
 
+LOGOUT_REDIRECT_URL = '/trabajador/login/'
