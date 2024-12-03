@@ -1,27 +1,57 @@
 {% extends 'Principal/base.html' %}
-
+{% load form_filters %}
 {% block content1 %}
 <div class="container py-5">
-    <h2>Registro de Clientes</h2>
-    <form method="post">
+    <h2 class="mb-4 text-center">Registro</h2>
+    <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
-        <div class="mb-3">
-            <label for="id_username" class="form-label">Nombre de usuario</label>
-            <input type="text" name="username" class="form-control" id="id_username" required>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_username" class="form-label">Nombre de Usuario</label>
+                {{ form.username|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_email" class="form-label">Correo Electrónico</label>
+                {{ form.email|add_class:"form-control" }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_first_name" class="form-label">Nombre</label>
+                {{ form.first_name|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_last_name" class="form-label">Apellido</label>
+                {{ form.last_name|add_class:"form-control" }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_phone_number" class="form-label">Número de Teléfono</label>
+                {{ form.phone_number|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_postal_code" class="form-label">Código Postal</label>
+                {{ form.postal_code|add_class:"form-control" }}
+            </div>
         </div>
         <div class="mb-3">
-            <label for="id_email" class="form-label">Correo electrónico</label>
-            <input type="email" name="email" class="form-control" id="id_email" required>
+            <label for="id_address" class="form-label">Dirección</label>
+            {{ form.address|add_class:"form-control" }}
         </div>
-        <div class="mb-3">
-            <label for="id_password" class="form-label">Contraseña</label>
-            <input type="password" name="password" class="form-control" id="id_password" required>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_password" class="form-label">Contraseña</label>
+                {{ form.password|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                <label for="id_password_confirm" class="form-label">Confirmar Contraseña</label>
+                {{ form.password_confirm|add_class:"form-control" }}
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="id_password_confirm" class="form-label">Confirmar Contraseña</label>
-            <input type="password" name="password_confirm" class="form-control" id="id_password_confirm" required>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Registrarse</button>
         </div>
-        <button type="submit" class="btn btn-primary">Registrarse</button>
     </form>
 </div>
 {% endblock %}
