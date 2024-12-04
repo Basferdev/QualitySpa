@@ -157,3 +157,50 @@ def datos_graficos(request):
         'semanales': {'labels': labels_semanales, 'data': data_semanales},
         'mensuales': {'labels': labels_mensuales, 'data': data_mensuales},
     })
+
+@login_required
+def cotizaciones_entrantes(request):
+    if not request.user.groups.filter(name='vendedores').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    # Cotizaciones de las últimas 3 horas
+    tres_horas_atras = now() - timedelta(hours=3)
+    cotizaciones = Cotizacion.objects.filter(fecha__gte=tres_horas_atras, estado='pendiente').order_by('-fecha')
+
+    return render(request, 'trabajadores/vendedor/cotizaciones_entrantes.html', {'cotizaciones': cotizaciones})
+
+@login_required
+def cotizaciones_pendientes(request):
+    if not request.user.groups.filter(name='vendedores').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    tres_horas_atras = now() - timedelta(hours=3)
+    cotizaciones = Cotizacion.objects.filter(fecha__lt=tres_horas_atras, estado='pendiente').order_by('-fecha')
+
+    return render(request, 'trabajadores/vendedor/cotizaciones_pendientes.html', {'cotizaciones': cotizaciones})
+
+@login_required
+def cotizaciones_resueltas(request):
+    if not request.user.groups.filter(name='vendedores').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    cotizaciones = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).order_by('-fecha')
+
+    return render(request, 'trabajadores/vendedor/cotizaciones_resueltas.html', {'cotizaciones': cotizaciones})
+
+@login_required
+def cotizaciones_rechazadas(request):
+    if not request.user.groups.filter(name='vendedores').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    cotizaciones = Cotizacion.objects.filter(estado='rechazada').order_by('-fecha')
+
+    return render(request, 'trabajadores/vendedor/cotizaciones_rechazadas.html', {'cotizaciones': cotizaciones})
+
+@login_required
+def detalle_cotizacion(request, id):
+    if not request.user.groups.filter(name='vendedores').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    cotizacion = Cotizacion.objects.get(id=id)
+    return render(request, 'trabajadores/vendedor/detalle_cotizacion.html', {'cotizacion': cotizacion})
