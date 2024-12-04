@@ -3,6 +3,9 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.contrib import messages
+from django.db.models import Q
+from Tienda.models import Shop
+
 # Create your views here.
 def home(request):
     return render(request, 'Principal/home.html')
@@ -34,3 +37,18 @@ def contacto(request):
     return redirect('contact')
 def contact(request):
     return render(request, 'Principal/contact.html')
+
+def buscar_productos(request):
+    query = request.GET.get('q', '').strip()
+    productos = []
+
+    if query:
+        # Filtrar productos por título o descripción
+        productos = Shop.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+
+    return render(request, 'Tienda/buscar.html', {
+        'query': query,           # Término de búsqueda
+        'productos': productos,   # Productos encontrados
+    })

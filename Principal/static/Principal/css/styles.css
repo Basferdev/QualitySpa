@@ -1,0 +1,46 @@
+.product-wap {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-wap img {
+    transition: transform 0.3s ease;
+}
+
+.product-wap:hover img {
+    transform: scale(1.1);
+}
+
+.product-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.product-wap:hover .product-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+.product-overlay .btn {
+    color: #fff;
+    font-size: 18px;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.product-overlay .btn:hover {
+    background-color: #007bff;
+    color: #fff;
+}
