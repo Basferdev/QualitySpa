@@ -102,13 +102,29 @@
                     <a class="nav-icon position-relative text-decoration-none" href="{% url 'trabajador_login' %}">
                         <i class="fa fa-fw fa-user-tie text-dark mr-3"></i>
                     </a>
-
-                    
                 </div>
             </div>
         </div>
     </nav>
     <!-- Close Header -->
+
+    <!-- Modal para búsqueda -->
+    <div class="modal fade" id="templatemo_search" tabindex="-1" aria-labelledby="searchLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="searchLabel">Buscar Productos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'buscar_productos' %}" method="get" class="d-flex">
+                        <input type="text" name="q" class="form-control me-2" placeholder="Escribe el nombre o descripción del producto..." required>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {% block content1 %}
     {% endblock %}

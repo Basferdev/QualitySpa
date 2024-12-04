@@ -65,6 +65,8 @@ urlpatterns = [
     path('cliente/logout/', LogoutView.as_view(next_page='login'), name='cliente_logout'),  # Logout para clientes
     path('vendedor/logout/', LogoutView.as_view(next_page='trabajador_login'), name='vendedor_logout'),
 
+    path('buscar/', views.buscar_productos, name='buscar_productos'),
+
     # Incluyendo rutas de la app login si es necesario
     path('login/', include('login.urls')),
 ]
