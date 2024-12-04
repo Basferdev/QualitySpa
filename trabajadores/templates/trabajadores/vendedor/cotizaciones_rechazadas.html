@@ -1,0 +1,76 @@
+{% extends 'trabajadores/base_trabajadores.html' %}
+
+{% block dashboard %}
+<a class="navbar-brand ps-3" href="{% url 'dashboard_vendedor' %}">Quality Spa</a>
+{% endblock %}
+
+{% block sidebar %}
+<div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Gestión de Cotizaciones</div>
+                <a class="nav-link" href="{% url 'dashboard_vendedor' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    Dashboard
+                </a>
+                <a class="nav-link" href="{% url 'revisar_cotizaciones' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-file-invoice"></i></div>
+                    Cotizaciones Pendientes
+                </a>
+                <a class="nav-link" href="{% url 'historial_cotizaciones' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-history"></i></div>
+                    Historial de Cotizaciones
+                </a>
+                <a class="nav-link" href="{% url 'estadisticas_ventas' %}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-chart-bar"></i></div>
+                    Estadísticas de Ventas
+                </a>
+            </div>
+        </div>
+        <div class="sb-sidenav-footer">
+            <div class="small">Logged in as:</div>
+            {{ user.username }}
+            <a href="{% url 'vendedor_logout' %}" class="dropdown-item">Logout</a>
+        </div>
+    </nav>
+</div>
+{% endblock %}
+
+{% block title %}
+<h1 class="mt-4">Cotizaciones Rechazadas</h1>
+{% endblock %}
+
+{% block content1 %}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Motivo de Rechazo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cotizacion in cotizaciones %}
+            <tr>
+                <td>{{ cotizacion.id }}</td>
+                <td>{{ cotizacion.cliente }}</td>
+                <td>{{ cotizacion.fecha }}</td>
+                <td>${{ cotizacion.total }}</td>
+                <td>{{ cotizacion.motivo_rechazo|default:"No especificado" }}</td>
+                <td><a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalle</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if not cotizaciones %}
+    <div class="alert alert-warning" role="alert">
+        No hay cotizaciones rechazadas.
+    </div>
+    {% endif %}
+
+{% endblock %}

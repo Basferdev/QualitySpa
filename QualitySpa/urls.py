@@ -51,6 +51,11 @@ urlpatterns = [
     path('cotizacion/rechazar/<int:id>/', viewsTrabajadores.rechazar_cotizacion, name='rechazar_cotizacion'),
     path('datos-graficos/', viewsTrabajadores.datos_graficos, name='datos_graficos'),
 
+    path('cotizaciones/entrantes/', viewsTrabajadores.cotizaciones_entrantes, name='cotizaciones_entrantes'),
+    path('cotizaciones/pendientes/', viewsTrabajadores.cotizaciones_pendientes, name='cotizaciones_pendientes'),
+    path('cotizaciones/resueltas/', viewsTrabajadores.cotizaciones_resueltas, name='cotizaciones_resueltas'),
+    path('cotizaciones/rechazadas/', viewsTrabajadores.cotizaciones_rechazadas, name='cotizaciones_rechazadas'),
+    path('cotizacion/detalle/<int:id>/', viewsTrabajadores.detalle_cotizacion, name='detalle_cotizacion'),
     
     # Rutas de clientes
     path('login/', viewsLogin.user_login, name='login'),  # Ruta para login de clientes

@@ -44,15 +44,70 @@
 
 {% block content1 %}
 <div class="container mt-5">
-    <p>Total de Ventas: ${{ estadisticas.total_ventas }}</p>
-    <p>Número de Cotizaciones: {{ estadisticas.numero_cotizaciones }}</p>
-    <p>Clientes Atendidos: {{ estadisticas.clientes_atendidos }}</p>
+    <div class="row mb-4">
+        <!-- Tarjeta para Total de Ventas -->
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Total de Ventas</div>
+                <div class="card-body">
+                    <h5 class="card-title">${{ estadisticas.total_ventas }}</h5>
+                    <p class="card-text">Monto total generado por cotizaciones aceptadas.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Tarjeta para Número de Cotizaciones -->
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Número de Cotizaciones</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ estadisticas.numero_cotizaciones }}</h5>
+                    <p class="card-text">Cantidad total de cotizaciones aceptadas.</p>
+                </div>
+            </div>
+        </div>
+        <!-- Tarjeta para Clientes Atendidos -->
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Clientes Atendidos</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ estadisticas.clientes_atendidos }}</h5>
+                    <p class="card-text">Total de clientes únicos que realizaron cotizaciones.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <h3>Productos Más Vendidos</h3>
-    <ul>
-        {% for producto in estadisticas.productos_mas_vendidos %}
-        <li>{{ producto.producto }} - {{ producto.cantidad }} vendidos</li>
-        {% endfor %}
-    </ul>
+    <!-- Tabla de Productos Más Vendidos -->
+    <div class="card">
+        <div class="card-header">
+            <h4>Productos Más Vendidos</h4>
+        </div>
+        <div class="card-body">
+            {% if estadisticas.productos_mas_vendidos %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Producto</th>
+                        <th>Cantidad Vendida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in estadisticas.productos_mas_vendidos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ producto.producto }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="alert alert-warning" role="alert">
+                No hay productos vendidos aún.
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}
