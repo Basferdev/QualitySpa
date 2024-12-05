@@ -1,10 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Group, User
 from django.contrib.auth import login, authenticate
 from .forms import RegistrationForm, LoginForm
 from django.http import HttpResponseForbidden
-from django.contrib.auth.decorators import login_required
 from .models import UserProfile
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .forms import UpdateProfileForm
+from trabajadores.models import Cotizacion
+from django.db.models import Sum
 
 def register(request):
     if request.method == 'POST':
@@ -43,33 +47,97 @@ def register(request):
 
 @login_required
 def cliente_dashboard(request):
-    """
-    Vista protegida exclusiva para clientes.
-    """
-    # Validar que el usuario pertenece al grupo 'clientes'
     if not request.user.groups.filter(name='clientes').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Lógica específica para clientes (puedes cargar datos relacionados aquí)
-    return render(request, 'login/cliente_dashboard.html')
+    # Obtener cotizaciones del cliente actual
+    cotizaciones = Cotizacion.objects.filter(cliente=request.user)
 
-def user_login(request):
+    # Calcular estadísticas
+    total_cotizaciones = cotizaciones.count()
+    total_gastado = cotizaciones.filter(estado='aceptada').aggregate(total=Sum('total'))['total'] or 0
+
+    context = {
+        'cotizaciones': cotizaciones,
+        'total_cotizaciones': total_cotizaciones,
+        'total_gastado': total_gastado,
+    }
+    return render(request, 'login/cliente_dashboard.html', context)
+
+@login_required
+def actualizar_perfil(request):
+    if not request.user.groups.filter(name='clientes').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    if request.method == 'POST':
+        form = UpdateProfileForm(request.POST, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Perfil actualizado exitosamente.")
+            return redirect('cliente_dashboard')
+    else:
+        form = UpdateProfileForm(instance=request.user.profile)
+
+    return render(request, 'login/actualizar_perfil.html', {'form': form})
+
+
+@login_required
+def detalle_cotizacion(request, id):
+    if not request.user.groups.filter(name='clientes').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    cotizacion = get_object_or_404(Cotizacion, id=id, cliente=request.user)
+    return render(request, 'login/detalle_cotizacion.html', {'cotizacion': cotizacion})
+
+
+def user_login_clientes(request):
+    """
+    Vista de login para clientes.
+    """
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                
-                # Redirigir según el grupo del usuario
+
+            if user:
                 if user.groups.filter(name='clientes').exists():
-                    return redirect('cliente_dashboard')  # Cambia 'cliente_dashboard' por la URL del dashboard de clientes
+                    login(request, user)
+                    return redirect('cliente_dashboard')  # Redirige al dashboard de clientes
                 else:
-                    return redirect('home')  # Redirigir a home si no es cliente
+                    messages.error(request, 'No tienes permiso para acceder como cliente.')
+            else:
+                messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
+    else:
+        form = LoginForm()
+
+    return render(request, 'login/login.html', {'form': form})
+
+def user_login_trabajadores(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                # Verificar si el usuario es administrador
+                if user.groups.filter(name='administradores').exists():
+                    login(request, user)
+                    return redirect('/admin/')  # Redirige al panel de Django
+
+                # Verificar si el usuario es vendedor
+                elif user.groups.filter(name='vendedores').exists():
+                    login(request, user)
+                    return redirect('dashboard_vendedor')  # Redirige al dashboard del vendedor
+                
+                # Usuario no autorizado
+                else:
+                    form.add_error(None, 'No tienes permiso para acceder como trabajador.')
             else:
                 form.add_error(None, 'Nombre de usuario o contraseña incorrectos.')
     else:
         form = LoginForm()
-    return render(request, 'login/login.html', {'form': form})
+    return render(request, 'login/trabajador_login.html', {'form': form})

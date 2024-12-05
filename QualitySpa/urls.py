@@ -42,8 +42,7 @@ urlpatterns = [
     path('carrito/update', viewsArticulos.update_cart, name='update_cart'),
 
     # Rutas del vendedor
-    path('trabajador/login/', viewsTrabajadores.trabajador_login, name='trabajador_login'),
-    path('vendedor/dashboard/', viewsTrabajadores.vendedor_dashboard, name='dashboard_vendedor'),
+    path('vendedor_dashboard/', viewsTrabajadores.vendedor_dashboard, name='dashboard_vendedor'),
     path('vendedor/cotizaciones/', viewsTrabajadores.revisar_cotizaciones, name='revisar_cotizaciones'),
     path('vendedor/historial/', viewsTrabajadores.historial_cotizaciones, name='historial_cotizaciones'),
     path('vendedor/estadisticas/', viewsTrabajadores.estadisticas_ventas, name='estadisticas_ventas'),
@@ -62,12 +61,14 @@ urlpatterns = [
     path('cotizacion/detalle/<int:id>/', viewsTrabajadores.detalle_cotizacion, name='detalle_cotizacion'),
     
     # Rutas de clientes
-    path('login/', viewsLogin.user_login, name='login'),  # Ruta para login de clientes
     path('register/', viewsLogin.register, name='register'),  # Ruta para registro de clientes
     path('dashboard/', viewsLogin.cliente_dashboard, name='cliente_dashboard'),  # Dashboard de clientes
 
-    path('cliente/logout/', LogoutView.as_view(next_page='login'), name='cliente_logout'),  # Logout para clientes
-    path('vendedor/logout/', LogoutView.as_view(next_page='trabajador_login'), name='vendedor_logout'),
+    path('cliente/logout/', LogoutView.as_view(next_page='login_clientes'), name='cliente_logout'),  # Logout para clientes
+    path('vendedor/logout/', LogoutView.as_view(next_page='login_trabajadores'), name='vendedor_logout'),
+
+    path('login_clientes/', viewsLogin.user_login_clientes, name='login_clientes'),
+    path('login_trabajadores/', viewsLogin.user_login_trabajadores, name='login_trabajadores'),
 
     path('buscar/', views.buscar_productos, name='buscar_productos'),
 

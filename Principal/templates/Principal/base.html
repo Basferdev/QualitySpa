@@ -93,13 +93,13 @@
                         <i class="fa fa-fw fa-sign-out-alt text-dark mr-3"></i>
                     </a>
                     {% else %}
-                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'login' %}">
+                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'login_clientes' %}">
                         <i class="fa fa-fw fa-sign-in-alt text-dark mr-3"></i>
                     </a>
                     {% endif %}
 
                     <!-- Login exclusivo para trabajadores -->
-                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'trabajador_login' %}">
+                    <a class="nav-icon position-relative text-decoration-none" href="{% url 'login_trabajadores' %}">
                         <i class="fa fa-fw fa-user-tie text-dark mr-3"></i>
                     </a>
                 </div>
