@@ -46,7 +46,7 @@
     <div class="col-xl-3 col-md-6">
         <a href="{% url 'cotizaciones_entrantes' %}" class="text-decoration-none">
             <div class="card bg-primary text-white mb-4">
-                <div class="card-body">Cotizaciones entrantes</div>
+                <div class="card-body">Cotizaciones Entrantes</div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
                     <span class="text-white">{{ cotizaciones_entrantes }}</span>
                     <div class="small text-white"><i class="fas fa-angle-right"></i></div>
@@ -57,7 +57,7 @@
     <div class="col-xl-3 col-md-6">
         <a href="{% url 'cotizaciones_pendientes' %}" class="text-decoration-none">
             <div class="card bg-warning text-white mb-4">
-                <div class="card-body">Cotizaciones pendientes</div>
+                <div class="card-body">Cotizaciones Pendientes</div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
                     <span class="text-white">{{ cotizaciones_pendientes }}</span>
                     <div class="small text-white"><i class="fas fa-angle-right"></i></div>
@@ -68,7 +68,7 @@
     <div class="col-xl-3 col-md-6">
         <a href="{% url 'cotizaciones_resueltas' %}" class="text-decoration-none">
             <div class="card bg-success text-white mb-4">
-                <div class="card-body">Cotizaciones resueltas</div>
+                <div class="card-body">Cotizaciones Resueltas</div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
                     <span class="text-white">{{ cotizaciones_resueltas }}</span>
                     <div class="small text-white"><i class="fas fa-angle-right"></i></div>
@@ -79,7 +79,7 @@
     <div class="col-xl-3 col-md-6">
         <a href="{% url 'cotizaciones_rechazadas' %}" class="text-decoration-none">
             <div class="card bg-danger text-white mb-4">
-                <div class="card-body">Cotizaciones rechazadas</div>
+                <div class="card-body">Cotizaciones Rechazadas</div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
                     <span class="text-white">{{ cotizaciones_rechazadas }}</span>
                     <div class="small text-white"><i class="fas fa-angle-right"></i></div>
@@ -90,7 +90,6 @@
 </div>
 {% endblock %}
 
-<!-- Gráficos -->
 {% block graphs %}
 <div class="row">
     <div class="col-xl-6">
@@ -120,54 +119,42 @@
     fetch("{% url 'datos_graficos' %}")
         .then(response => response.json())
         .then(data => {
-            // Gráfico semanal
-            if (data.semanales.data.length > 0) {
-                const ctxArea = document.getElementById('myAreaChart').getContext('2d');
+            const ctxArea = document.getElementById('myAreaChart').getContext('2d');
+            const ctxBar = document.getElementById('myBarChart').getContext('2d');
+
+            // Gráfico Semanal
+            if (data.semanales.data.length) {
                 new Chart(ctxArea, {
                     type: 'line',
                     data: {
                         labels: data.semanales.labels,
                         datasets: [{
-                            label: 'Cotizaciones por día',
                             data: data.semanales.data,
                             fill: true,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderWidth: 1
+                            borderColor: '#4bc0c0',
+                            backgroundColor: '#4bc0c030'
                         }]
                     }
                 });
-            } else {
-                document.getElementById('myAreaChart').parentElement.innerHTML = "<p>No hay datos para el gráfico semanal.</p>";
             }
 
-            // Gráfico mensual
-            if (data.mensuales.data.length > 0) {
-                const ctxBar = document.getElementById('myBarChart').getContext('2d');
+            // Gráfico Mensual
+            if (data.mensuales.data.length) {
                 new Chart(ctxBar, {
                     type: 'bar',
                     data: {
                         labels: data.mensuales.labels,
                         datasets: [{
-                            label: 'Ventas por mes',
                             data: data.mensuales.data,
-                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                            borderColor: 'rgba(153, 102, 255, 1)',
-                            borderWidth: 1
+                            backgroundColor: '#36a2eb',
                         }]
                     }
                 });
-            } else {
-                document.getElementById('myBarChart').parentElement.innerHTML = "<p>No hay datos para el gráfico mensual.</p>";
             }
-        })
-        .catch(error => {
-            console.error("Error al cargar los datos del gráfico:", error);
         });
 </script>
 {% endblock %}
 
-<!-- Tabla de datos -->
 {% block dataTables %}
 <div class="card mb-4">
     <div class="card-header">
@@ -194,9 +181,18 @@
                     <td>${{ cotizacion.total }}</td>
                     <td>{{ cotizacion.estado }}</td>
                 </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay cotizaciones disponibles.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        $('#datatablesSimple').DataTable();
+    });
+</script>
 {% endblock %}
