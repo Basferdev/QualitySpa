@@ -2,13 +2,54 @@
 
 {% block content1 %}
 <div class="container py-5">
-    <h2>Bienvenido, {{ user.username }}</h2>
-    <p>Esta sección es exclusiva para clientes.</p>
+    <h2 class="text-center mb-4">Bienvenido, {{ user.first_name }} {{ user.last_name }}</h2>
 
-    <h3>Tus Opciones</h3>
-    <ul>
-        <li><a href="#">Ver Productos</a></li>
-        <li><a href="#">Ver Tus Cotizaciones</a></li>
-    </ul>
+    <!-- Opciones del Perfil -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            Opciones del Perfil
+        </div>
+        <div class="card-body">
+            <a href="{% url 'actualizar_perfil' %}" class="btn btn-primary">Actualizar Perfil</a>
+            <a href="{% url 'password_change' %}" class="btn btn-secondary">Cambiar Contraseña</a>
+        </div>
+    </div>
+
+    <!-- Historial de Cotizaciones -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            Historial de Cotizaciones
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cotizacion in cotizaciones %}
+                    <tr>
+                        <td>{{ cotizacion.id }}</td>
+                        <td>{{ cotizacion.fecha }}</td>
+                        <td>{{ cotizacion.estado }}</td>
+                        <td>${{ cotizacion.total }}</td>
+                        <td>
+                            <a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalles</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No tienes cotizaciones realizadas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}
