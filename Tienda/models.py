@@ -17,7 +17,6 @@ class Clasificacion(models.Model):
     def __str__(self):
         return(self.name)
 
-
 class Shop(models.Model):
     title = models.CharField(max_length=100,verbose_name="Nombre Producto")
     description = models.TextField(verbose_name="Descripcion")
@@ -37,4 +36,26 @@ class Shop(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class Cotizacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    cantidad_productos = models.IntegerField()
+    cotizacion_id = models.CharField(max_length=100, unique=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Cotización {self.cotizacion_id}"
+
+class DetalleCotizacion(models.Model):
+    cotizacion = models.ForeignKey(Cotizacion, on_delete=models.CASCADE, related_name='detalles')
+    producto = models.ForeignKey(Shop, on_delete=models.CASCADE)  # Relacionamos con el modelo Shop
+    cantidad = models.IntegerField()
+    precio_total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        # Calcula el precio total
+        self.precio_total = self.producto.price * self.cantidad
+        super().save(*args, **kwargs)
 
