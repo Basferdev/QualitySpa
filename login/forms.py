@@ -55,13 +55,33 @@ class RegistrationForm(forms.ModelForm):
             raise forms.ValidationError("El correo electrónico ya está en uso. Por favor elige otro.")
         return email
 
+    def clean_password(self):
+        password = self.cleaned_data.get("password")
+
+        # Validar que la contraseña tenga exactamente 8 caracteres
+        if len(password) != 8:
+            raise forms.ValidationError("La contraseña debe tener exactamente 8 caracteres.")
+
+        # Validar que la contraseña contenga al menos una letra mayúscula
+        if not any(char.isupper() for char in password):
+            raise forms.ValidationError("La contraseña debe contener al menos una letra mayúscula.")
+
+        return password
+
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
         password_confirm = cleaned_data.get("password_confirm")
 
+        # Validar que las contraseñas coincidan
         if password and password_confirm and password != password_confirm:
             self.add_error('password_confirm', "Las contraseñas no coinciden.")
+
+        # Validar que todos los campos sean obligatorios
+        for field_name, field_value in cleaned_data.items():
+            if not field_value:
+                self.add_error(field_name, f"El campo {self.fields[field_name].label} es obligatorio.")
+        return cleaned_data
 
 
 class LoginForm(forms.Form):
