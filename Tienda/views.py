@@ -168,7 +168,7 @@ def crear_cotizacion(request):
             cantidad_productos=cantidad_productos
         )
 
-        # Sumar los totales de los productos seleccionados
+        # Sumar los totales de los productos seleccionados 
         for producto_id, detalles in carrito.items():
             producto = Shop.objects.get(id=producto_id)
             cantidad = detalles['cantidad']
