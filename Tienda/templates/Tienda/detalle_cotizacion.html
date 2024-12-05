@@ -1,0 +1,20 @@
+{% extends 'Principal/base.html' %}
+
+{% block content1 %}
+<div class="container py-5">
+    <h2 class="mb-4">Detalles de la Cotización</h2>
+    <p><strong>ID:</strong> {{ cotizacion.id }}</p>
+    <p><strong>Fecha:</strong> {{ cotizacion.fecha }}</p>
+    <p><strong>Estado:</strong> {{ cotizacion.estado }}</p>
+    <p><strong>Total:</strong> ${{ cotizacion.total }}</p>
+
+    <h4>Productos</h4>
+    <ul>
+        {% for item in cotizacion.productos.all %}
+        <li>{{ item.nombre }} - ${{ item.precio }} (Cantidad: {{ item.cantidad }})</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'cliente_dashboard' %}" class="btn btn-secondary">Volver</a>
+</div>
+{% endblock %}

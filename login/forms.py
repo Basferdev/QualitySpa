@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from .models import UserProfile
 
 class RegistrationForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(attrs={
@@ -93,3 +94,13 @@ class LoginForm(forms.Form):
         'class': 'form-control',
         'placeholder': 'Contraseña'
     }))
+
+class UpdateProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['phone_number', 'address', 'postal_code']
+        widgets = {
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.Textarea(attrs={'class': 'form-control'}),
+            'postal_code': forms.TextInput(attrs={'class': 'form-control'}),
+        }
