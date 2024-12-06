@@ -15,7 +15,10 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 
 def generar_codigo_cotizacion():
-    return str(uuid.uuid4())
+    ultima_cotizacion = Cotizacion.objects.order_by('id').last()
+    nuevo_id = 1 if not ultima_cotizacion else ultima_cotizacion.id + 1
+    return str(nuevo_id)
+
 
 # Create your views here.
 
@@ -212,38 +215,7 @@ def agregar_al_carrito(request, producto_id):
     messages.success(request, f'El producto "{producto.title}" se ha añadido al carrito.')
     return redirect(request.META.get('HTTP_REFERER', 'lista_productos'))
 
-def generar_excel_cotizacion(cotizacion_id):
-    cotizacion = Cotizacion.objects.get(cotizacion_id=cotizacion_id)
 
-    # Ruta al archivo de plantilla
-    archivo_plantilla = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', 'Tienda', 'excel', 'planillaQuality.xlsx')
-
-    # Cargar la plantilla
-    wb = load_workbook(archivo_plantilla)
-    ws = wb.active
-
-    # Completar la cotización en el Excel
-    ws['A2'] = cotizacion.cotizacion_id
-    ws['B2'] = cotizacion.usuario.username
-    ws['C2'] = cotizacion.total
-    ws['D2'] = cotizacion.cantidad_productos
-    ws['E2'] = cotizacion.fecha_creacion
-
-    # Agregar los detalles de los productos
-    fila = 5  # Comenzamos a escribir los productos a partir de la fila 5
-    for detalle in cotizacion.detalles.all():
-        ws[f'A{fila}'] = detalle.producto.title  # Nombre del producto
-        ws[f'B{fila}'] = detalle.producto.price  # Precio unitario
-        ws[f'C{fila}'] = detalle.cantidad  # Cantidad
-        ws[f'D{fila}'] = detalle.precio_total  # Precio total
-        fila += 1
-
-    # Respuesta HTTP para descargar el archivo Excel
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename=cotizacion_{cotizacion.cotizacion_id}.xlsx'
-    wb.save(response)
-
-    return response
 
 def guardar_detalle_cotizacion(request, cotizacion_id):
     # Verificar que haya productos en el carrito
@@ -301,3 +273,120 @@ def guardar_detalle_cotizacion(request, cotizacion_id):
 
 
 
+from reportlab.pdfgen import canvas
+from django.conf import settings
+import os
+
+def generar_pdf_cotizacion(cotizacion):
+    # Crear el nombre del archivo
+    pdf_filename = f"{cotizacion.cotizacion_id}.pdf"
+    pdf_dir = os.path.join(settings.MEDIA_ROOT, 'cotizaciones_pdfs')
+    pdf_path = os.path.join(pdf_dir, pdf_filename)
+
+    # Crear la carpeta si no existe
+    if not os.path.exists(pdf_dir):
+        os.makedirs(pdf_dir)
+
+    # Crear el canvas para generar el PDF
+    c = canvas.Canvas(pdf_path)
+
+    # Título
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(100, 800, f"Cotización #{cotizacion.cotizacion_id}")
+
+    # Información general
+    c.setFont("Helvetica", 12)
+    c.drawString(100, 770, f"Usuario: {cotizacion.usuario.username}")
+    c.drawString(100, 750, f"Fecha: {cotizacion.fecha_creacion.strftime('%Y-%m-%d')}")
+
+    # Encabezado de la tabla
+    c.drawString(100, 720, "Productos:")
+    y = 700
+    productos = json.loads(cotizacion.productos_json or '[]')
+
+    for producto in productos:
+        c.drawString(100, y, f"- {producto['producto']} x {producto['cantidad']} (${producto['precio_unitario']} c/u)")
+        y -= 20
+
+    # Total
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(100, y - 20, f"Total: ${cotizacion.total}")
+
+    # Guardar PDF
+    c.save()
+    return f"cotizaciones_pdfs/{pdf_filename}"
+def crear_cotizacion(request):
+    if request.method == 'POST':
+        carrito = request.session.get('carrito', {})
+        if not carrito:
+            messages.error(request, "Tu carrito está vacío. No se puede generar una cotización.")
+            return redirect('ver_carrito')
+
+        total = 0
+        cantidad_productos = 0
+        cotizacion_id = generar_codigo_cotizacion()
+
+        try:
+            with transaction.atomic():
+                # Crear la cotización
+                cotizacion = Cotizacion(
+                    usuario=request.user,
+                    cotizacion_id=cotizacion_id,
+                    total=0,  # Inicializamos en 0, se actualizará después
+                    cantidad_productos=0
+                )
+                cotizacion.save()
+
+                productos = []
+                for producto_id, detalles in carrito.items():
+                    try:
+                        producto = Shop.objects.get(id=producto_id)
+                    except Shop.DoesNotExist:
+                        messages.error(request, f"El producto con ID {producto_id} no existe.")
+                        return redirect('ver_carrito')
+
+                    cantidad = detalles['cantidad']
+                    precio_unitario = producto.price
+                    total += precio_unitario * cantidad
+                    cantidad_productos += cantidad
+
+                    # Agregar el producto a la lista de productos
+                    productos.append({
+                        'producto': producto.title,
+                        'cantidad': cantidad,
+                        'precio_unitario': precio_unitario
+                    })
+
+                # Guardar los productos en formato JSON en la cotización
+                cotizacion.productos_json = json.dumps(productos)
+                cotizacion.total = total
+                cotizacion.cantidad_productos = cantidad_productos
+                cotizacion.save()
+
+                # Generar el PDF
+                pdf_path = generar_pdf_cotizacion(cotizacion)
+                cotizacion.pdf_file = pdf_path
+                cotizacion.save()
+
+                # Vaciar el carrito
+                request.session['carrito'] = {}
+                request.session['total_productos'] = 0
+
+                messages.success(request, "La cotización ha sido generada con éxito.")
+                return redirect('ver_carrito')
+
+        except Exception as e:
+            messages.error(request, f"Se produjo un error: {str(e)}")
+            return redirect('ver_carrito')
+
+    return redirect('ver_carrito')
+
+from django.http import FileResponse
+
+def descargar_cotizacion_pdf(request, cotizacion_id):
+    cotizacion = get_object_or_404(Cotizacion, cotizacion_id=cotizacion_id)
+    if not cotizacion.pdf_file:
+        messages.error(request, "La cotización no tiene un archivo PDF.")
+        return redirect('ver_carrito')
+    
+    return FileResponse(open(cotizacion.pdf_file.path, 'rb'), content_type='application/pdf')    
