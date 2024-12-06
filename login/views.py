@@ -47,11 +47,12 @@ def register(request):
 
 @login_required
 def cliente_dashboard(request):
+    # Verificar si el usuario pertenece al grupo "clientes"
     if not request.user.groups.filter(name='clientes').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Obtener cotizaciones del cliente actual
-    cotizaciones = Cotizacion.objects.filter(cliente=request.user)
+    # Obtener cotizaciones del cliente actual (usuario)
+    cotizaciones = Cotizacion.objects.filter(usuario=request.user)
 
     # Calcular estadísticas
     total_cotizaciones = cotizaciones.count()
