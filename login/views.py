@@ -7,7 +7,7 @@ from .models import UserProfile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import UpdateProfileForm
-from trabajadores.models import Cotizacion
+from Tienda.models import Cotizacion
 from django.db.models import Sum
 
 def register(request):

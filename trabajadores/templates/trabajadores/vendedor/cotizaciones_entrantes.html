@@ -42,26 +42,31 @@
 {% endblock %}
 
 {% block content1 %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Fecha</th>
-                <th>Total</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cotizacion in cotizaciones %}
-            <tr>
-                <td>{{ cotizacion.id }}</td>
-                <td>{{ cotizacion.cliente }}</td>
-                <td>{{ cotizacion.fecha }}</td>
-                <td>${{ cotizacion.total }}</td>
-                <td><a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalle</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cotizacion in cotizaciones %}
+        <tr>
+            <td>{{ cotizacion.id }}</td>
+            <td>{{ cotizacion.usuario.username }}</td>
+            <td>{{ cotizacion.fecha_creacion|date:"d/m/Y" }}</td>
+            <td>${{ cotizacion.total }}</td>
+            <td><a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalle</a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">No hay cotizaciones disponibles.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}

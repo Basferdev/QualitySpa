@@ -126,12 +126,12 @@ def crear_cotizacion(request):
 
         try:
             with transaction.atomic():
-                # Crear la cotización
+                # Crear la cotización sin estado ni vendedor
                 cotizacion = Cotizacion(
                     usuario=request.user,
                     cotizacion_id=cotizacion_id,
                     total=0,  # Inicializamos en 0, se actualizará después
-                    cantidad_productos=0
+                    cantidad_productos=0,
                 )
                 cotizacion.save()
 
@@ -173,6 +173,8 @@ def crear_cotizacion(request):
             return redirect('ver_carrito')
 
     return redirect('ver_carrito')
+
+
 
 
 
@@ -296,8 +298,3 @@ def guardar_detalle_cotizacion(request, cotizacion_id):
 
     messages.success(request, "Detalles de la cotización guardados exitosamente.")
     return redirect('ver_carrito')
-
-
-
-
-

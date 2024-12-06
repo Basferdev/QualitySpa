@@ -1,20 +1,23 @@
-{% extends 'Principal/base.html' %}
+{% extends 'trabajadores/base_trabajadores.html' %}
+
+{% block title %}
+<h1 class="mt-4">Detalle de Cotización</h1>
+{% endblock %}
 
 {% block content1 %}
-<div class="container py-5">
-    <h2 class="mb-4">Detalles de la Cotización</h2>
-    <p><strong>ID:</strong> {{ cotizacion.id }}</p>
-    <p><strong>Fecha:</strong> {{ cotizacion.fecha }}</p>
-    <p><strong>Estado:</strong> {{ cotizacion.estado }}</p>
-    <p><strong>Total:</strong> ${{ cotizacion.total }}</p>
-
-    <h4>Productos</h4>
-    <ul>
-        {% for item in cotizacion.productos.all %}
-        <li>{{ item.nombre }} - ${{ item.precio }} (Cantidad: {{ item.cantidad }})</li>
-        {% endfor %}
-    </ul>
-
-    <a href="{% url 'cliente_dashboard' %}" class="btn btn-secondary">Volver</a>
+<div class="card">
+    <div class="card-header">Cotización {{ cotizacion.id }}</div>
+    <div class="card-body">
+        <p><strong>Cliente:</strong> {{ cotizacion.usuario.username }}</p>
+        <p><strong>Fecha de Creación:</strong> {{ cotizacion.fecha_creacion }}</p>
+        <p><strong>Total:</strong> ${{ cotizacion.total }}</p>
+        <p><strong>Estado:</strong> {{ cotizacion.estado }}</p>
+        <p><strong>Productos:</strong></p>
+        <ul>
+            {% for producto in productos %}
+                <li>{{ producto.producto }} - {{ producto.cantidad }} unidades a ${{ producto.precio_unitario }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
 {% endblock %}
