@@ -38,7 +38,7 @@
 {% endblock %}
 
 {% block title %}
-<h1 class="mt-4">Cotizaciones Resueltas</h1>
+<h1 class="mt-4">Cotizaciones Aceptadas</h1>
 {% endblock %}
 
 {% block content1 %}
@@ -49,27 +49,31 @@
                 <th>Cliente</th>
                 <th>Fecha</th>
                 <th>Total</th>
-                <th>Estado</th>
                 <th>Acciones</th>
+                <th>PDF</th>
             </tr>
         </thead>
         <tbody>
             {% for cotizacion in cotizaciones %}
             <tr>
                 <td>{{ cotizacion.id }}</td>
-                <td>{{ cotizacion.cliente }}</td>
-                <td>{{ cotizacion.fecha }}</td>
+                <td>{{ cotizacion.usuario.username }}</td>
+                <td>{{ cotizacion.fecha_creacion|date:"d-m-Y H:i" }}</td>
                 <td>${{ cotizacion.total }}</td>
-                <td>{{ cotizacion.estado|title }}</td>
                 <td><a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalle</a></td>
+                <td>
+                    {% if cotizacion.pdf_file %}
+                    <a href="{{ cotizacion.pdf_file.url }}" class="btn btn-outline-primary btn-sm" target="_blank">Ver PDF</a>
+                    {% else %}
+                    <span class="text-muted">No disponible</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No hay cotizaciones aceptadas.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    {% if not cotizaciones %}
-    <div class="alert alert-warning" role="alert">
-        No hay cotizaciones resueltas.
-    </div>
-    {% endif %}
-
 {% endblock %}

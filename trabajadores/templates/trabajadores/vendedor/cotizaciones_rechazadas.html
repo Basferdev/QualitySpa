@@ -42,7 +42,6 @@
 {% endblock %}
 
 {% block content1 %}
-
     <table class="table">
         <thead>
             <tr>
@@ -50,7 +49,6 @@
                 <th>Cliente</th>
                 <th>Fecha</th>
                 <th>Total</th>
-                <th>Motivo de Rechazo</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -58,19 +56,16 @@
             {% for cotizacion in cotizaciones %}
             <tr>
                 <td>{{ cotizacion.id }}</td>
-                <td>{{ cotizacion.cliente }}</td>
-                <td>{{ cotizacion.fecha }}</td>
+                <td>{{ cotizacion.usuario.username }}</td>
+                <td>{{ cotizacion.fecha_creacion|date:"d-m-Y H:i" }}</td>
                 <td>${{ cotizacion.total }}</td>
-                <td>{{ cotizacion.motivo_rechazo|default:"No especificado" }}</td>
                 <td><a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalle</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No hay cotizaciones rechazadas.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    {% if not cotizaciones %}
-    <div class="alert alert-warning" role="alert">
-        No hay cotizaciones rechazadas.
-    </div>
-    {% endif %}
-
 {% endblock %}

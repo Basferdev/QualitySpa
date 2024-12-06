@@ -35,11 +35,11 @@
                     {% for cotizacion in cotizaciones %}
                     <tr>
                         <td>{{ cotizacion.id }}</td>
-                        <td>{{ cotizacion.fecha }}</td>
+                        <td>{{ cotizacion.fecha_creacion|date:"d-m-Y H:i" }}</td>
                         <td>{{ cotizacion.estado }}</td>
                         <td>${{ cotizacion.total }}</td>
                         <td>
-                            <a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalles</a>
+                            <a href="{% url 'descargar_cotizacion' cotizacion.cotizacion_id %}" class="btn btn-primary btn-sm">Descargar PDF</a>
                         </td>
                     </tr>
                     {% empty %}

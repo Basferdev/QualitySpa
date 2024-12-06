@@ -31,15 +31,14 @@ urlpatterns = [
     path('vendedor/cotizaciones/', viewsTrabajadores.revisar_cotizaciones, name='revisar_cotizaciones'),
     path('vendedor/historial/', viewsTrabajadores.historial_cotizaciones, name='historial_cotizaciones'),
     path('vendedor/estadisticas/', viewsTrabajadores.estadisticas_ventas, name='estadisticas_ventas'),
-    path('cotizacion/aprobar/<int:id>/', viewsTrabajadores.aprobar_cotizacion, name='aprobar_cotizacion'),
-    path('cotizacion/rechazar/<int:id>/', viewsTrabajadores.rechazar_cotizacion, name='rechazar_cotizacion'),
+    path('cotizacion/<int:id>/aprobar/', viewsTrabajadores.aprobar_cotizacion, name='aprobar_cotizacion'),
+    path('cotizacion/<int:id>/rechazar/', viewsTrabajadores.rechazar_cotizacion, name='rechazar_cotizacion'),
     path('datos-graficos/', viewsTrabajadores.datos_graficos, name='datos_graficos'),
 
     # Rutas de cotizaciones
     path('crear-cotizacion/', viewsArticulos.crear_cotizacion, name='crear_cotizacion'),
     path('descargar-cotizacion/<str:cotizacion_id>/', viewsArticulos.descargar_cotizacion_pdf, name='descargar_cotizacion'),
 
-    path('cotizaciones/entrantes/', viewsTrabajadores.cotizaciones_entrantes, name='cotizaciones_entrantes'),
     path('cotizaciones/pendientes/', viewsTrabajadores.cotizaciones_pendientes, name='cotizaciones_pendientes'),
     path('cotizaciones/resueltas/', viewsTrabajadores.cotizaciones_resueltas, name='cotizaciones_resueltas'),
     path('cotizaciones/rechazadas/', viewsTrabajadores.cotizaciones_rechazadas, name='cotizaciones_rechazadas'),

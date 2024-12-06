@@ -44,18 +44,7 @@
 {% block cards %}
 <div class="row">
     <div class="col-xl-3 col-md-6">
-        <a href="{% url 'cotizaciones_entrantes' %}" class="text-decoration-none">
-            <div class="card bg-primary text-white mb-4">
-                <div class="card-body">Cotizaciones Entrantes</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <span class="text-white">{{ cotizaciones_entrantes }}</span>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <a href="{% url 'cotizaciones_pendientes' %}" class="text-decoration-none">
+        <a href="{% url 'revisar_cotizaciones' %}" class="text-decoration-none">
             <div class="card bg-warning text-white mb-4">
                 <div class="card-body">Cotizaciones Pendientes</div>
                 <div class="card-footer d-flex align-items-center justify-content-between">

@@ -9,3 +9,4 @@ class LoginForm(forms.Form):
         'class': 'form-control',
         'placeholder': 'Contraseña'
     }), label="Contraseña")
+    

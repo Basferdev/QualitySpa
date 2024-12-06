@@ -21,19 +21,23 @@ def register(request):
                 user.first_name = form.cleaned_data['first_name']
                 user.last_name = form.cleaned_data['last_name']
                 user.save()
-                
-                # Crear el perfil de usuario
-                UserProfile.objects.create(
-                    user=user,
-                    phone_number=form.cleaned_data['phone_number'],
-                    address=form.cleaned_data['address'],
-                    postal_code=form.cleaned_data['postal_code']
-                )
-                
+
+                # Verificar si ya existe un perfil
+                if not hasattr(user, 'profile'):
+                    # Crear el perfil de usuario
+                    UserProfile.objects.create(
+                        user=user,
+                        phone_number=form.cleaned_data['phone_number'],
+                        address=form.cleaned_data['address'],
+                        postal_code=form.cleaned_data['postal_code'],
+                        first_name=form.cleaned_data['first_name'],
+                        last_name=form.cleaned_data['last_name']
+                    )
+
                 # Asignar al grupo 'clientes'
                 group = Group.objects.get(name='clientes')
                 user.groups.add(group)
-                
+
                 # Autenticar automáticamente
                 login(request, user)
                 return redirect('cliente_dashboard')  # Cambia a la URL de tu dashboard de clientes
@@ -126,11 +130,31 @@ def user_login_trabajadores(request):
             if user is not None:
                 # Verificar si el usuario es administrador
                 if user.groups.filter(name='administradores').exists():
+                    # Asegurarse de que tenga un perfil
+                    if not hasattr(user, 'profile'):
+                        UserProfile.objects.create(
+                            user=user,
+                            phone_number="0000000000",  # Datos predeterminados
+                            address="Dirección predeterminada",
+                            postal_code="00000",
+                            first_name=user.first_name or "Nombre",
+                            last_name=user.last_name or "Apellido"
+                        )
                     login(request, user)
                     return redirect('/admin/')  # Redirige al panel de Django
 
                 # Verificar si el usuario es vendedor
                 elif user.groups.filter(name='vendedores').exists():
+                    # Asegurarse de que tenga un perfil
+                    if not hasattr(user, 'profile'):
+                        UserProfile.objects.create(
+                            user=user,
+                            phone_number="0000000000",  # Datos predeterminados
+                            address="Dirección predeterminada",
+                            postal_code="00000",
+                            first_name=user.first_name or "Nombre",
+                            last_name=user.last_name or "Apellido"
+                        )
                     login(request, user)
                     return redirect('dashboard_vendedor')  # Redirige al dashboard del vendedor
                 
@@ -142,3 +166,4 @@ def user_login_trabajadores(request):
     else:
         form = LoginForm()
     return render(request, 'login/trabajador_login.html', {'form': form})
+
