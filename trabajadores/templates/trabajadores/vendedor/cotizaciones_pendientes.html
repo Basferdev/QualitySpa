@@ -57,16 +57,26 @@
             <tr>
                 <td>{{ cotizacion.id }}</td>
                 <td>{{ cotizacion.cliente }}</td>
-                <td>{{ cotizacion.fecha }}</td>
+                <td>{{ cotizacion.fecha|date:"d-m-Y H:i" }}</td>
                 <td>${{ cotizacion.total }}</td>
-                <td><a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalle</a></td>
+                <td>
+                    <form method="post" action="{% url 'aprobar_cotizacion' cotizacion.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">Aprobar</button>
+                    </form>
+                    <form method="post" action="{% url 'rechazar_cotizacion' cotizacion.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Rechazar</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No hay cotizaciones pendientes.</td>
             </tr>
             {% endfor %}
         </tbody>
+        
     </table>
-    {% if not cotizaciones %}
-    <div class="alert alert-warning" role="alert">
-        No hay cotizaciones pendientes.
-    </div>
-    {% endif %}
 {% endblock %}
+

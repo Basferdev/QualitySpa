@@ -58,8 +58,8 @@
             {% for cotizacion in historial %}
             <tr>
                 <td>{{ cotizacion.id }}</td>
-                <td>{{ cotizacion.cliente }}</td>
-                <td>{{ cotizacion.fecha }}</td>
+                <td>{{ cotizacion.usuario.first_name }} {{ cotizacion.usuario.last_name }}</td>
+                <td>{{ cotizacion.fecha_creacion|date:"d-m-Y H:i" }}</td>
                 <td>${{ cotizacion.total }}</td>
                 <td>{{ cotizacion.estado|title }}</td>
             </tr>

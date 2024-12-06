@@ -38,35 +38,27 @@
 {% endblock %}
 
 {% block title %}
-<h1 class="mt-4">Cotizaciones Entrantes</h1>
+<h1 class="mt-4">Detalle de Cotización</h1>
 {% endblock %}
 
-{% block content1 %}
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Cliente</th>
-            <th>Fecha</th>
-            <th>Total</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for cotizacion in cotizaciones %}
-        <tr>
-            <td>{{ cotizacion.id }}</td>
-            <td>{{ cotizacion.usuario.username }}</td>
-            <td>{{ cotizacion.fecha_creacion|date:"d/m/Y" }}</td>
-            <td>${{ cotizacion.total }}</td>
-            <td><a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalle</a></td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5" class="text-center">No hay cotizaciones disponibles.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
+{% block content1 %} 
+<div class="card">
+    <div class="card-header">Cotización {{ cotizacion.id }}</div>
+    <div class="card-body">
+        <p><strong>Cliente:</strong> {{ cliente_nombre }} (Teléfono: {{ cliente_numero }})</p>
+        <p><strong>Fecha de Creación:</strong> {{ cotizacion.fecha_creacion|date:"d-m-Y H:i" }}</p>
+        <p><strong>Total:</strong> ${{ cotizacion.total }}</p>
+        <p><strong>Estado:</strong> {{ cotizacion.estado }}</p>
+        <p><strong>Productos:</strong></p>
+        <ul>
+            {% for producto in productos %}
+            <li>{{ producto.producto }} - {{ producto.cantidad }} unidades a ${{ producto.precio_unitario }}</li>
+            {% empty %}
+            <li>No hay productos en esta cotización.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 {% endblock %}
+

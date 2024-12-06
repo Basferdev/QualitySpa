@@ -63,10 +63,11 @@
                     {% for cotizacion in cotizaciones %}
                     <tr>
                         <td>{{ cotizacion.id }}</td>
-                        <td>{{ cotizacion.cliente }}</td>
-                        <td>{{ cotizacion.fecha }}</td>
+                        <td>{{ cotizacion.cliente_nombre }}</td>  <!-- Mostrar el nombre del cliente -->
+                        <td>{{ cotizacion.fecha_creacion|date:"d-m-Y " }}</td>  <!-- Mostrar la fecha formateada -->
                         <td>${{ cotizacion.total }}</td>
                         <td>
+                            <a href="{% url 'detalle_cotizacion' cotizacion.id %}" class="btn btn-primary btn-sm">Ver Detalle</a>
                             <a href="{% url 'aprobar_cotizacion' cotizacion.id %}" class="btn btn-success btn-sm">Aprobar</a>
                             <a href="{% url 'rechazar_cotizacion' cotizacion.id %}" class="btn btn-danger btn-sm">Rechazar</a>
                         </td>

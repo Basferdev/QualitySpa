@@ -67,7 +67,12 @@ class Cotizacion(models.Model):
         ],
         default='pendiente'
     )
+    # Nuevos campos
+    cliente_nombre = models.CharField(max_length=50, blank=True, null=True)
+    cliente_apellido = models.CharField(max_length=50, blank=True, null=True)
+    cliente_telefono = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
         return f"Cotización {self.cotizacion_id}"
+
 

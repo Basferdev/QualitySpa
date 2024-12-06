@@ -10,6 +10,10 @@ from datetime import timedelta
 from django.utils.timezone import now
 from django.contrib import messages
 from Tienda.models import Cotizacion
+import json
+from login.models import UserProfile
+from django.contrib.auth.models import User
+
 
 # Dashboard del vendedor
 @login_required
@@ -41,21 +45,27 @@ def revisar_cotizaciones(request):
 
     return render(request, 'trabajadores/vendedor/revisar_cotizaciones.html', {'cotizaciones': cotizaciones})
 
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+
 # Aprobar cotización
 @login_required
 def aprobar_cotizacion(request, id):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Verificar que la cotización esté asignada al vendedor actual
-    cotizacion = Cotizacion.objects.filter(id=id, vendedor=request.user).first()
-    if not cotizacion:
-        return HttpResponseForbidden("No tienes permiso para aprobar esta cotización.")
-
+    # Obtener la cotización
+    cotizacion = get_object_or_404(Cotizacion, id=id)
     cotizacion.estado = 'aceptada'
     cotizacion.save()
     messages.success(request, "Cotización aprobada exitosamente.")
     return redirect('revisar_cotizaciones')
+
+@login_required
+def cotizaciones_resueltas(request):
+    cotizaciones = Cotizacion.objects.filter(estado='aceptada')
+    context = {'cotizaciones': cotizaciones}
+    return render(request, 'trabajadores/vendedor/cotizaciones_aceptadas.html', context)
 
 # Rechazar cotización
 @login_required
@@ -63,15 +73,18 @@ def rechazar_cotizacion(request, id):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Verificar que la cotización esté asignada al vendedor actual
-    cotizacion = Cotizacion.objects.filter(id=id, vendedor=request.user).first()
-    if not cotizacion:
-        return HttpResponseForbidden("No tienes permiso para rechazar esta cotización.")
-
+    # Obtener la cotización
+    cotizacion = get_object_or_404(Cotizacion, id=id)
     cotizacion.estado = 'rechazada'
     cotizacion.save()
     messages.success(request, "Cotización rechazada exitosamente.")
     return redirect('revisar_cotizaciones')
+
+@login_required
+def cotizaciones_rechazadas(request):
+    cotizaciones = Cotizacion.objects.filter(estado='rechazada')
+    context = {'cotizaciones': cotizaciones}
+    return render(request, 'trabajadores/vendedor/cotizaciones_rechazadas.html', context)
 
 # Historial de cotizaciones
 @login_required
@@ -79,8 +92,8 @@ def historial_cotizaciones(request):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Filtrar cotizaciones aceptadas o rechazadas del vendedor actual
-    historial = Cotizacion.objects.filter(vendedor=request.user, estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')
+    # Filtrar cotizaciones aceptadas o rechazadas relacionadas al usuario
+    historial = Cotizacion.objects.filter(usuario=request.user, estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')
     return render(request, 'trabajadores/vendedor/historial_cotizaciones.html', {'historial': historial})
 
 # Estadísticas de ventas
@@ -172,52 +185,76 @@ def datos_graficos(request):
         'mensuales': {'labels': labels_mensuales, 'data': data_mensuales},
     })
 
-@login_required
-def cotizaciones_entrantes(request):
-    if not request.user.groups.filter(name='vendedores').exists():
-        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Cambiar 'fecha' por 'fecha_creacion'
-    cotizaciones = Cotizacion.objects.filter(estado='pendiente').order_by('-fecha_creacion')
 
-    return render(request, 'trabajadores/vendedor/cotizaciones_entrantes.html', {'cotizaciones': cotizaciones})
+from django.shortcuts import render
+from Tienda.models import Cotizacion
 
-@login_required
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from Tienda.models import Cotizacion
+
 def cotizaciones_pendientes(request):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Cotizaciones que llevan más de 3 horas en estado pendiente
-    tres_horas_atras = now() - timedelta(hours=3)
-    cotizaciones = Cotizacion.objects.filter(fecha__lt=tres_horas_atras, estado='pendiente').order_by('-fecha')
+    # Filtrar cotizaciones pendientes
+    cotizaciones = Cotizacion.objects.filter(estado='pendiente')
 
-    return render(request, 'trabajadores/vendedor/cotizaciones_pendientes.html', {'cotizaciones': cotizaciones})
+    # Agregar datos de clientes y fechas
+    cotizaciones_datos = []
+    for cotizacion in cotizaciones:
+        cliente = cotizacion.usuario  # Usuario relacionado
 
-@login_required
-def cotizaciones_resueltas(request):
-    if not request.user.groups.filter(name='vendedores').exists():
-        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+        # Concatenar el nombre y apellido del cliente
+        cliente_nombre = f"{cliente.first_name} {cliente.last_name}"
 
-    cotizaciones = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).order_by('-fecha')
+        # Agregar los datos a la lista de cotizaciones
+        cotizaciones_datos.append({
+            'cotizacion': cotizacion,
+            'cliente_nombre': cliente_nombre,
+        })
 
-    return render(request, 'trabajadores/vendedor/cotizaciones_resueltas.html', {'cotizaciones': cotizaciones})
+    context = {'cotizaciones': cotizaciones_datos}
+    return render(request, 'Tienda/cotizaciones_pendientes.html', context)
 
-@login_required
-def cotizaciones_rechazadas(request):
-    if not request.user.groups.filter(name='vendedores').exists():
-        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
-
-    cotizaciones = Cotizacion.objects.filter(estado='rechazada').order_by('-fecha')
-
-    return render(request, 'trabajadores/vendedor/cotizaciones_rechazadas.html', {'cotizaciones': cotizaciones})
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from Tienda.models import Cotizacion
+import json
 
 @login_required
 def detalle_cotizacion(request, id):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Obtener la cotización, mostrando error si no existe
+    # Obtener la cotización
     cotizacion = get_object_or_404(Cotizacion, id=id)
 
-    return render(request, 'Tienda/detalle_cotizacion.html', {'cotizacion': cotizacion})
+    # Obtener el cliente asociado a la cotización
+    cliente = cotizacion.usuario
+
+    # Intentar obtener el perfil del cliente desde UserProfile
+    try:
+        perfil = cliente.profile  # Accede a UserProfile usando la relación OneToOne
+        cliente_nombre = f"{cliente.first_name} {cliente.last_name}"
+        cliente_telefono = perfil.phone_number  # Accede al número de teléfono
+    except UserProfile.DoesNotExist:
+        cliente_nombre = f"{cliente.first_name} {cliente.last_name}"
+        cliente_telefono = "No disponible"
+
+    # Preparar los datos de los productos desde el JSON almacenado
+    productos = json.loads(cotizacion.productos_json)
+
+    # Crear contexto con datos del cliente y la cotización
+    context = {
+        'cotizacion': cotizacion,
+        'productos': productos,
+        'cliente_nombre': cliente_nombre,
+        'cliente_numero': cliente_telefono,
+    }
+
+    return render(request, 'trabajadores/vendedor/detalle_cotizacion.html', context)
 
