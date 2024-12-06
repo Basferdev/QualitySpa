@@ -5,10 +5,17 @@ from django.contrib import messages
 from django.http import JsonResponse
 import random
 import string
-from .models import Shop,Clasificacion,Cotizacion,DetalleCotizacion
+from .models import Shop,Clasificacion,Cotizacion
 from openpyxl import load_workbook
 from django.http import HttpResponse
 import os
+import uuid
+from django.db import transaction
+import json
+from django.core.exceptions import ObjectDoesNotExist
+
+def generar_codigo_cotizacion():
+    return str(uuid.uuid4())
 
 # Create your views here.
 
@@ -106,51 +113,8 @@ def update_cart(request):
     total_productos = request.session.get('total_productos', 0)
     return JsonResponse({'total_productos': total_productos})
 
-def generar_codigo_cotizacion():
-    """Genera un código único para la cotización."""
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-
-# def generar_excel_cotizacion(cotizacion_id):
-#     cotizacion = Cotizacion.objects.get(cotizacion_id=cotizacion_id)
-
-#     # Ruta al archivo de plantilla
-#     archivo_plantilla = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', 'Tienda', 'excel', 'planillaQuality.xlsx')
-
-#     # Cargar la plantilla
-#     wb = load_workbook(archivo_plantilla)
-#     ws = wb.active
-
-#     # Completar la cotización en el Excel
-#     ws['A2'] = cotizacion.cotizacion_id
-#     ws['B2'] = cotizacion.usuario.username
-#     ws['C2'] = cotizacion.total
-#     ws['D2'] = cotizacion.cantidad_productos
-#     ws['E2'] = cotizacion.fecha_creacion
-
-#     # Agregar los detalles de los productos
-#     fila = 5  # Comenzamos a escribir los productos a partir de la fila 5
-#     for detalle in cotizacion.detalles.all():
-#         ws[f'A{fila}'] = detalle.producto.title  # Nombre del producto
-#         ws[f'B{fila}'] = detalle.producto.price  # Precio unitario
-#         ws[f'C{fila}'] = detalle.cantidad  # Cantidad
-#         ws[f'D{fila}'] = detalle.precio_total  # Precio total
-#         fila += 1
-
-#     # Respuesta HTTP para descargar el archivo Excel
-#     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-#     response['Content-Disposition'] = f'attachment; filename=cotizacion_{cotizacion.cotizacion_id}.xlsx'
-#     wb.save(response)
-
-#     return response
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.http import JsonResponse
-from .models import Shop, Cotizacion
-
 def crear_cotizacion(request):
     if request.method == 'POST':
-        # Obtener los productos y cantidades desde el carrito
         carrito = request.session.get('carrito', {})
         if not carrito:
             messages.error(request, "Tu carrito está vacío. No se puede generar una cotización.")
@@ -158,39 +122,58 @@ def crear_cotizacion(request):
 
         total = 0
         cantidad_productos = 0
+        cotizacion_id = generar_codigo_cotizacion()
 
-        # Crear la cotización
-        cotizacion_id = generar_codigo_cotizacion()  # Generar código único para la cotización
-        cotizacion = Cotizacion.objects.create(
-            usuario=request.user,
-            cotizacion_id=cotizacion_id,
-            total=total,
-            cantidad_productos=cantidad_productos
-        )
+        try:
+            with transaction.atomic():
+                # Crear la cotización
+                cotizacion = Cotizacion(
+                    usuario=request.user,
+                    cotizacion_id=cotizacion_id,
+                    total=0,  # Inicializamos en 0, se actualizará después
+                    cantidad_productos=0
+                )
+                cotizacion.save()
 
-        # Sumar los totales de los productos seleccionados 
-        for producto_id, detalles in carrito.items():
-            producto = Shop.objects.get(id=producto_id)
-            cantidad = detalles['cantidad']
-            total += producto.price * cantidad
-            cantidad_productos += cantidad
+                productos = []
+                for producto_id, detalles in carrito.items():
+                    try:
+                        producto = Shop.objects.get(id=producto_id)
+                    except Shop.DoesNotExist:
+                        messages.error(request, f"El producto con ID {producto_id} no existe.")
+                        return redirect('ver_carrito')
 
-        # Actualizar la cotización con los totales
-        cotizacion.total = total
-        cotizacion.cantidad_productos = cantidad_productos
-        cotizacion.save()
+                    cantidad = detalles['cantidad']
+                    precio_unitario = producto.price
+                    total += precio_unitario * cantidad
+                    cantidad_productos += cantidad
 
-        # Vaciar el carrito
-        request.session['carrito'] = {}
-        request.session['total_productos'] = 0
+                    # Agregar el producto a la lista de productos
+                    productos.append({
+                        'producto': producto.title,
+                        'cantidad': cantidad,
+                        'precio_unitario': precio_unitario
+                    })
 
-        # Mostrar mensaje de éxito
-        messages.success(request, "La cotización ha sido generada con éxito.")
+                # Guardar los productos en formato JSON en la cotización
+                cotizacion.productos_json = json.dumps(productos)
+                cotizacion.total = total
+                cotizacion.cantidad_productos = cantidad_productos
+                cotizacion.save()
 
-        # Redirigir al carrito vacío con el mensaje
-        return redirect('ver_carrito')
+                # Vaciar el carrito
+                request.session['carrito'] = {}
+                request.session['total_productos'] = 0
 
-    return redirect('ver_carrito')  # Si no es un POST, solo redirigimos al carrito
+                messages.success(request, "La cotización ha sido generada con éxito.")
+                return redirect('ver_carrito')
+
+        except Exception as e:
+            messages.error(request, f"Se produjo un error: {str(e)}")
+            return redirect('ver_carrito')
+
+    return redirect('ver_carrito')
+
 
 
 def agregar_al_carrito(request, producto_id):
@@ -229,7 +212,90 @@ def agregar_al_carrito(request, producto_id):
     messages.success(request, f'El producto "{producto.title}" se ha añadido al carrito.')
     return redirect(request.META.get('HTTP_REFERER', 'lista_productos'))
 
+def generar_excel_cotizacion(cotizacion_id):
+    cotizacion = Cotizacion.objects.get(cotizacion_id=cotizacion_id)
 
+    # Ruta al archivo de plantilla
+    archivo_plantilla = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', 'Tienda', 'excel', 'planillaQuality.xlsx')
+
+    # Cargar la plantilla
+    wb = load_workbook(archivo_plantilla)
+    ws = wb.active
+
+    # Completar la cotización en el Excel
+    ws['A2'] = cotizacion.cotizacion_id
+    ws['B2'] = cotizacion.usuario.username
+    ws['C2'] = cotizacion.total
+    ws['D2'] = cotizacion.cantidad_productos
+    ws['E2'] = cotizacion.fecha_creacion
+
+    # Agregar los detalles de los productos
+    fila = 5  # Comenzamos a escribir los productos a partir de la fila 5
+    for detalle in cotizacion.detalles.all():
+        ws[f'A{fila}'] = detalle.producto.title  # Nombre del producto
+        ws[f'B{fila}'] = detalle.producto.price  # Precio unitario
+        ws[f'C{fila}'] = detalle.cantidad  # Cantidad
+        ws[f'D{fila}'] = detalle.precio_total  # Precio total
+        fila += 1
+
+    # Respuesta HTTP para descargar el archivo Excel
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=cotizacion_{cotizacion.cotizacion_id}.xlsx'
+    wb.save(response)
+
+    return response
+
+def guardar_detalle_cotizacion(request, cotizacion_id):
+    # Verificar que haya productos en el carrito
+    carrito = request.session.get('carrito', {})
+    if not carrito:
+        messages.error(request, "Tu carrito está vacío. No se puede generar el detalle de la cotización.")
+        return redirect('ver_carrito')
+
+    try:
+        cotizacion = Cotizacion.objects.get(id=cotizacion_id)
+    except ObjectDoesNotExist:
+        messages.error(request, "No se encontró la cotización.")
+        return redirect('ver_carrito')
+
+    # Si la cotización existe, actualizamos sus productos
+    productos = []
+    total = 0
+    cantidad_productos = 0
+
+    # Recorrer los productos del carrito y actualizar los detalles
+    for producto_id, detalles in carrito.items():
+        try:
+            producto = Shop.objects.get(id=producto_id)
+        except Shop.DoesNotExist:
+            messages.error(request, f"El producto con ID {producto_id} no existe.")
+            return redirect('ver_carrito')
+
+        cantidad = detalles['cantidad']
+        precio_unitario = producto.price
+        total += precio_unitario * cantidad
+        cantidad_productos += cantidad
+
+        # Agregar cada producto al array de productos
+        productos.append({
+            'producto': producto.title,
+            'cantidad': cantidad,
+            'precio_unitario': precio_unitario
+        })
+
+    # Guardar los productos en el campo JSON de la cotización
+    cotizacion.productos_json = json.dumps(productos)
+    cotizacion.total = total
+    cotizacion.cantidad_productos = cantidad_productos
+    cotizacion.estado = 'Generada'  # Cambiar estado de la cotización
+    cotizacion.save()
+
+    # Vaciar el carrito y redirigir al usuario
+    request.session['carrito'] = {}
+    request.session['total_productos'] = 0
+
+    messages.success(request, "Detalles de la cotización guardados exitosamente.")
+    return redirect('ver_carrito')
 
 
 
