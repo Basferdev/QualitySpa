@@ -13,12 +13,14 @@ import uuid
 from django.db import transaction
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from reportlab.pdfgen import canvas
+from django.conf import settings
+import os
 
 def generar_codigo_cotizacion():
     ultima_cotizacion = Cotizacion.objects.order_by('id').last()
     nuevo_id = 1 if not ultima_cotizacion else ultima_cotizacion.id + 1
     return str(nuevo_id)
-
 
 # Create your views here.
 
@@ -129,12 +131,12 @@ def crear_cotizacion(request):
 
         try:
             with transaction.atomic():
-                # Crear la cotización
+                # Crear la cotización sin estado ni vendedor
                 cotizacion = Cotizacion(
                     usuario=request.user,
                     cotizacion_id=cotizacion_id,
                     total=0,  # Inicializamos en 0, se actualizará después
-                    cantidad_productos=0
+                    cantidad_productos=0,
                 )
                 cotizacion.save()
 
@@ -176,6 +178,8 @@ def crear_cotizacion(request):
             return redirect('ver_carrito')
 
     return redirect('ver_carrito')
+
+
 
 
 
@@ -273,9 +277,7 @@ def guardar_detalle_cotizacion(request, cotizacion_id):
 
 
 
-from reportlab.pdfgen import canvas
-from django.conf import settings
-import os
+
 
 def generar_pdf_cotizacion(cotizacion):
     # Crear el nombre del archivo

@@ -56,17 +56,18 @@ class Cotizacion(models.Model):
     cantidad_productos = models.IntegerField()
     cotizacion_id = models.CharField(max_length=100, unique=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    productos_json = models.TextField(blank=True, null=True)  # Campo para guardar el JSON
-    pdf_file = models.FileField(upload_to='cotizaciones_pdfs/', null=True, blank=True)  # Ruta al PDF
+    productos_json = models.TextField(blank=True, null=True)
+    pdf_file = models.FileField(upload_to='cotizaciones_pdfs/', null=True, blank=True)
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('pendiente', 'Pendiente'),
+            ('aceptada', 'Aceptada'),
+            ('rechazada', 'Rechazada'),
+        ],
+        default='pendiente'
+    )
 
     def __str__(self):
         return f"Cotización {self.cotizacion_id}"
-
-
-
-
-
-
-
-
 
