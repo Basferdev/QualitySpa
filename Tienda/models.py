@@ -56,6 +56,7 @@ class Cotizacion(models.Model):
     cantidad_productos = models.IntegerField()
     cotizacion_id = models.CharField(max_length=100, unique=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+<<<<<<< HEAD
     productos_json = models.TextField(blank=True, null=True)
     estado = models.CharField(
         max_length=10, 
@@ -65,7 +66,22 @@ class Cotizacion(models.Model):
     vendedor = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name='cotizaciones_asignadas'
     )
+=======
+    productos_json = models.TextField(blank=True, null=True)  # Campo para guardar el JSON
+    pdf_file = models.FileField(upload_to='cotizaciones_pdfs/', null=True, blank=True)  # Ruta al PDF
+>>>>>>> 2da6e547bdfd04539c497fc8d4e0f0c4d6639cfe
 
     def __str__(self):
         return f"Cotización {self.cotizacion_id}"
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+
+
+>>>>>>> 2da6e547bdfd04539c497fc8d4e0f0c4d6639cfe

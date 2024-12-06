@@ -37,7 +37,7 @@ urlpatterns = [
 
     # Rutas de cotizaciones
     path('crear-cotizacion/', viewsArticulos.crear_cotizacion, name='crear_cotizacion'),
-
+    path('descargar-cotizacion/<str:cotizacion_id>/', viewsArticulos.descargar_cotizacion_pdf, name='descargar_cotizacion'),
 
     path('cotizaciones/entrantes/', viewsTrabajadores.cotizaciones_entrantes, name='cotizaciones_entrantes'),
     path('cotizaciones/pendientes/', viewsTrabajadores.cotizaciones_pendientes, name='cotizaciones_pendientes'),
