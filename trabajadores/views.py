@@ -310,3 +310,50 @@ def estadisticas_ventas(request):
     }
 
     return render(request, 'trabajadores/vendedor/estadisticas_ventas.html', context)
+
+from django.http import JsonResponse
+from django.db.models import Sum
+from django.utils.timezone import now
+from datetime import timedelta
+
+@login_required
+def datos_valores(request):
+    if not request.user.groups.filter(name='vendedores').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    # Gráfico Semanal: Valores de Cotizaciones Aceptadas (Lunes-Domingo)
+    fecha_actual = now()
+    inicio_semana = fecha_actual - timedelta(days=fecha_actual.weekday())  # Lunes actual
+    dias_semana = [inicio_semana + timedelta(days=i) for i in range(7)]  # Lunes a Domingo
+
+    valores_semanales = [
+        Cotizacion.objects.filter(fecha_creacion__date=dia, estado='aceptada').aggregate(Sum('total'))['total__sum'] or 0
+        for dia in dias_semana
+    ]
+    labels_semanales = [dia.strftime('%A') for dia in dias_semana]
+
+    # Gráfico Mensual: Valores Aceptados del Mes en Curso (por semanas)
+    inicio_mes = fecha_actual.replace(day=1)
+    semanas_mes = [
+        (inicio_mes + timedelta(days=i * 7), inicio_mes + timedelta(days=(i + 1) * 7 - 1))
+        for i in range(4)  # Asumimos 5 semanas máximo en un mes
+    ]
+
+    valores_mensuales = [
+        Cotizacion.objects.filter(fecha_creacion__range=(inicio, fin), estado='aceptada').aggregate(Sum('total'))['total__sum'] or 0
+        for inicio, fin in semanas_mes
+    ]
+    labels_mensuales = [
+        f"Semana {i+1}" for i in range(len(semanas_mes))
+    ]
+
+    return JsonResponse({
+        'semanales': {
+            'labels': labels_semanales,
+            'valores': valores_semanales,
+        },
+        'mensuales': {
+            'labels': labels_mensuales,
+            'valores': valores_mensuales,
+        },
+    })
