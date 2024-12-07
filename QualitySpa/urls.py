@@ -34,6 +34,7 @@ urlpatterns = [
     path('cotizacion/<int:id>/rechazar/', viewsTrabajadores.rechazar_cotizacion, name='rechazar_cotizacion'),
     path('estadisticas_ventas/', viewsTrabajadores.estadisticas_ventas, name='estadisticas_ventas'),
     path('datos_graficos/', viewsTrabajadores.datos_graficos, name='datos_graficos'),
+    path('datos_valores/', viewsTrabajadores.datos_valores, name='datos_valores'),
 
 
 
