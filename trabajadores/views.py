@@ -25,21 +25,21 @@ def vendedor_dashboard(request):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Contar las cotizaciones pendientes
-    cotizaciones_pendientes = Cotizacion.objects.filter(estado='pendiente').count()
-
-    # Contar las cotizaciones resueltas (aceptadas o rechazadas)
-    cotizaciones_resueltas = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).count()
-
-    # Contar las cotizaciones rechazadas
+    cotizaciones_entrantes = Cotizacion.objects.filter(estado='pendiente').count()
+    cotizaciones_resueltas = Cotizacion.objects.filter(estado='aceptada').count()
     cotizaciones_rechazadas = Cotizacion.objects.filter(estado='rechazada').count()
+    total_cotizaciones = Cotizacion.objects.all().count()
+    
+    # Obtener las últimas 5 cotizaciones
+    historial_reciente = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')[:5]
 
     context = {
-        'cotizaciones_pendientes': cotizaciones_pendientes,
+        'cotizaciones_entrantes': cotizaciones_entrantes,
         'cotizaciones_resueltas': cotizaciones_resueltas,
         'cotizaciones_rechazadas': cotizaciones_rechazadas,
+        'total_cotizaciones': total_cotizaciones,
+        'historial': historial_reciente,  # Asegúrate de enviar las cotizaciones recientes
     }
-
     return render(request, 'trabajadores/vendedor/dashboard_vendedor.html', context)
 
 
@@ -104,9 +104,10 @@ def historial_cotizaciones(request):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Filtrar cotizaciones aceptadas o rechazadas relacionadas al usuario
-    historial = Cotizacion.objects.filter(usuario=request.user, estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')
+    # Filtrar todas las cotizaciones aceptadas o rechazadas
+    historial = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')
     return render(request, 'trabajadores/vendedor/historial_cotizaciones.html', {'historial': historial})
+
 
 # Estadísticas de ventas
 @login_required

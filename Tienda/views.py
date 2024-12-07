@@ -16,6 +16,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.platypus.flowables import Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from django.contrib.staticfiles import finders 
 
 def generar_codigo_cotizacion():
     ultima_cotizacion = Cotizacion.objects.order_by('id').last()
@@ -279,33 +285,75 @@ def generar_pdf_cotizacion(cotizacion):
     if not os.path.exists(pdf_dir):
         os.makedirs(pdf_dir)
 
-    # Crear el canvas para generar el PDF
-    c = canvas.Canvas(pdf_path)
+    # Crear el documento PDF
+    doc = SimpleDocTemplate(pdf_path, pagesize=letter)
+    elementos = []
 
-    # Título
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(100, 800, f"Cotización #{cotizacion.cotizacion_id}")
+    # Agregar logo con fondo negro en la esquina superior izquierda
+    def agregar_logo(canvas, doc):
+        # Buscar el archivo logo.png en la carpeta estática
+        logo_path = finders.find('Tienda/logo.jpeg')  # Buscar archivo en static/Tienda/logo.png
+        if logo_path:  # Verificar si se encuentra el archivo
+            canvas.saveState()
+
+            # Dibujar solo el logo (sin fondo negro)
+            lado_cuadrado = 100  # Tamaño del lado del cuadrado (ajustar según lo necesario)
+            canvas.drawImage(logo_path, 25, 735, width=lado_cuadrado, height=lado_cuadrado, mask='auto')
+
+            canvas.restoreState()
+        else:
+            print("No se encontró el archivo logo.png en static/Tienda/")
+
+    # Estilos y título
+    styles = getSampleStyleSheet()
+    titulo_estilo = styles['Heading1']
+    elementos.append(Paragraph(f"Cotización #{cotizacion.cotizacion_id}", titulo_estilo))
 
     # Información general
-    c.setFont("Helvetica", 12)
-    c.drawString(100, 770, f"Usuario: {cotizacion.usuario.username}")
-    c.drawString(100, 750, f"Fecha: {cotizacion.fecha_creacion.strftime('%Y-%m-%d')}")
+    info_estilo = styles['Normal']
+    elementos.append(Paragraph(f"Nombre: {cotizacion.usuario.first_name} {cotizacion.usuario.last_name}", info_estilo))
+    elementos.append(Paragraph(f"Fecha: {cotizacion.fecha_creacion.strftime('%d-%m-%Y')}", info_estilo))
+    # Agregar el número de teléfono
+    phone_number = cotizacion.usuario.profile.phone_number  # Acceder al número de teléfono desde el perfil del usuario
+    elementos.append(Paragraph(f"Teléfono: {phone_number}", info_estilo))
+    elementos.append(Spacer(1, 20))  # Espacio antes de la tabla
 
-    # Encabezado de la tabla
-    c.drawString(100, 720, "Productos:")
-    y = 700
+    # Productos como tabla
     productos = json.loads(cotizacion.productos_json or '[]')
-
+    data = [["Producto", "Cantidad", "Precio Unitario", "Subtotal"]]
     for producto in productos:
-        c.drawString(100, y, f"- {producto['producto']} x {producto['cantidad']} (${producto['precio_unitario']} c/u)")
-        y -= 20
+        data.append([ 
+            producto['producto'],
+            producto['cantidad'],
+            f"${producto['precio_unitario']}",
+            f"${producto['cantidad'] * producto['precio_unitario']}"
+        ])
 
-    # Total
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(100, y - 20, f"Total: ${cotizacion.total}")
+    # Estilo de la tabla
+    tabla = Table(data, colWidths=[200, 100, 100, 100])
+    tabla.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+    ]))
+    elementos.append(tabla)
 
-    # Guardar PDF
-    c.save()
+    # Calcular el IVA (19%)
+    iva = int(cotizacion.total * 0.19)  # IVA del 19%, convertido a entero
+    total_con_iva = cotizacion.total   # El total es el neto más el IVA
+
+    # Agregar detalles del IVA y Total
+    elementos.append(Spacer(1, 20))  # Espacio entre la tabla y los totales
+    elementos.append(Paragraph(f"<b>IVA (19%):</b> ${iva}", info_estilo))
+    elementos.append(Paragraph(f"<b>Total:</b> ${total_con_iva}", info_estilo))
+
+    # Generar el PDF
+    doc.build(elementos, onFirstPage=agregar_logo)
+
     return f"cotizaciones_pdfs/{pdf_filename}"
 
 def crear_cotizacion(request):
