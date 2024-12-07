@@ -30,10 +30,12 @@ urlpatterns = [
     path('vendedor_dashboard/', viewsTrabajadores.vendedor_dashboard, name='dashboard_vendedor'),
     path('vendedor/cotizaciones/', viewsTrabajadores.revisar_cotizaciones, name='revisar_cotizaciones'),
     path('vendedor/historial/', viewsTrabajadores.historial_cotizaciones, name='historial_cotizaciones'),
-    path('vendedor/estadisticas/', viewsTrabajadores.estadisticas_ventas, name='estadisticas_ventas'),
     path('cotizacion/<int:id>/aprobar/', viewsTrabajadores.aprobar_cotizacion, name='aprobar_cotizacion'),
     path('cotizacion/<int:id>/rechazar/', viewsTrabajadores.rechazar_cotizacion, name='rechazar_cotizacion'),
-    path('datos-graficos/', viewsTrabajadores.datos_graficos, name='datos_graficos'),
+    path('estadisticas_ventas/', viewsTrabajadores.estadisticas_ventas, name='estadisticas_ventas'),
+    path('datos_graficos/', viewsTrabajadores.datos_graficos, name='datos_graficos'),
+
+
 
     # Rutas de cotizaciones
     path('crear-cotizacion/', viewsArticulos.crear_cotizacion, name='crear_cotizacion'),
