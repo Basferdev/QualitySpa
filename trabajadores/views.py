@@ -16,6 +16,10 @@ from django.contrib.auth.models import User
 
 
 # Dashboard del vendedor
+from django.db.models import Count
+
+from django.db.models import Count
+
 @login_required
 def vendedor_dashboard(request):
     if not request.user.groups.filter(name='vendedores').exists():
@@ -24,15 +28,23 @@ def vendedor_dashboard(request):
     cotizaciones_entrantes = Cotizacion.objects.filter(estado='pendiente').count()
     cotizaciones_resueltas = Cotizacion.objects.filter(estado='aceptada').count()
     cotizaciones_rechazadas = Cotizacion.objects.filter(estado='rechazada').count()
-    total_ventas = Cotizacion.objects.filter(estado='aceptada').aggregate(total=Sum('total'))['total'] or 0
+    total_cotizaciones = Cotizacion.objects.all().count()
+    
+    # Obtener las últimas 5 cotizaciones
+    historial_reciente = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')[:5]
 
     context = {
         'cotizaciones_entrantes': cotizaciones_entrantes,
         'cotizaciones_resueltas': cotizaciones_resueltas,
         'cotizaciones_rechazadas': cotizaciones_rechazadas,
-        'total_ventas': total_ventas,
+        'total_cotizaciones': total_cotizaciones,
+        'historial': historial_reciente,  # Asegúrate de enviar las cotizaciones recientes
     }
     return render(request, 'trabajadores/vendedor/dashboard_vendedor.html', context)
+
+
+
+
 
 # Revisar cotizaciones con datos reales
 @login_required
@@ -92,9 +104,10 @@ def historial_cotizaciones(request):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    # Filtrar cotizaciones aceptadas o rechazadas relacionadas al usuario
-    historial = Cotizacion.objects.filter(usuario=request.user, estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')
+    # Filtrar todas las cotizaciones aceptadas o rechazadas
+    historial = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')
     return render(request, 'trabajadores/vendedor/historial_cotizaciones.html', {'historial': historial})
+
 
 # Estadísticas de ventas
 @login_required

@@ -43,28 +43,72 @@
 {% endblock %}
 
 {% block content1 %}
-<div class="container mt-5">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Fecha</th>
-                <th>Total</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cotizacion in historial %}
-            <tr>
-                <td>{{ cotizacion.id }}</td>
-                <td>{{ cotizacion.usuario.first_name }} {{ cotizacion.usuario.last_name }}</td>
-                <td>{{ cotizacion.fecha_creacion|date:"d-m-Y H:i" }}</td>
-                <td>${{ cotizacion.total }}</td>
-                <td>{{ cotizacion.estado|title }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <i class="fas fa-table me-1"></i>
+        Historial de Cotizaciones
+    </div>
+    <div class="card-body">
+        <table id="datatableHistorial" class="table table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th class="text-center">ID</th>
+                    <th>Cliente</th>
+                    <th class="text-center">Fecha</th>
+                    <th class="text-end">Total</th>
+                    <th class="text-center">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cotizacion in historial %}
+                <tr>
+                    <td class="text-center">{{ cotizacion.id }}</td>
+                    <td>{{ cotizacion.usuario.first_name }} {{ cotizacion.usuario.last_name }}</td>
+                    <td class="text-center">{{ cotizacion.fecha_creacion|date:"d-m-Y H:i" }}</td>
+                    <td class="text-end">${{ cotizacion.total }}</td>
+                    <td class="text-center">
+                        {% if cotizacion.estado == 'aceptada' %}
+                        <span class="badge bg-success">{{ cotizacion.estado|title }}</span>
+                        {% elif cotizacion.estado == 'rechazada' %}
+                        <span class="badge bg-danger">{{ cotizacion.estado|title }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay cotizaciones disponibles.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+<script>
+    $(document).ready(function () {
+        // Configuración para la tabla en el Dashboard
+        $('#datatableDashboard').DataTable({
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
+            },
+            order: [[2, 'desc']], // Ordena por fecha de forma descendente por defecto
+            columnDefs: [
+                { targets: [0, 2, 4], className: 'text-center' }, // Centrar columnas específicas
+                { targets: [3], className: 'text-end' } // Alinear a la derecha la columna Total
+            ]
+        });
+
+        // Configuración para la tabla en el Historial
+        $('#datatableHistorial').DataTable({
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
+            },
+            order: [[2, 'desc']], // Ordena por fecha de forma descendente por defecto
+            columnDefs: [
+                { targets: [0, 2, 4], className: 'text-center' }, // Centrar columnas específicas
+                { targets: [3], className: 'text-end' } // Alinear a la derecha la columna Total
+            ]
+        });
+    });
+</script>
+
 {% endblock %}
