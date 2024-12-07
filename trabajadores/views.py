@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from .forms import LoginForm  # Define este formulario en trabajadores/forms.py
 from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, functions, Count
+from django.db.models import Sum, functions, Count, Q
 from django.db.models.functions import TruncDay, TruncMonth
 from datetime import timedelta
 from django.utils.timezone import now
@@ -12,24 +12,17 @@ from django.contrib import messages
 from Tienda.models import Cotizacion
 import json
 from login.models import UserProfile
-from django.contrib.auth.models import User
-
+from django.utils.timezone import now, timedelta
 
 # Dashboard del vendedor
-from django.db.models import Count
-
-from django.db.models import Count
-
 @login_required
 def vendedor_dashboard(request):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
-
     cotizaciones_entrantes = Cotizacion.objects.filter(estado='pendiente').count()
     cotizaciones_resueltas = Cotizacion.objects.filter(estado='aceptada').count()
     cotizaciones_rechazadas = Cotizacion.objects.filter(estado='rechazada').count()
     total_cotizaciones = Cotizacion.objects.all().count()
-    
     # Obtener las últimas 5 cotizaciones
     historial_reciente = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')[:5]
 
@@ -42,10 +35,6 @@ def vendedor_dashboard(request):
     }
     return render(request, 'trabajadores/vendedor/dashboard_vendedor.html', context)
 
-
-
-
-
 # Revisar cotizaciones con datos reales
 @login_required
 def revisar_cotizaciones(request):
@@ -56,9 +45,6 @@ def revisar_cotizaciones(request):
     cotizaciones = Cotizacion.objects.filter(estado='pendiente')
 
     return render(request, 'trabajadores/vendedor/revisar_cotizaciones.html', {'cotizaciones': cotizaciones})
-
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib import messages
 
 # Aprobar cotización
 @login_required
@@ -108,7 +94,6 @@ def historial_cotizaciones(request):
     historial = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).order_by('-fecha_creacion')
     return render(request, 'trabajadores/vendedor/historial_cotizaciones.html', {'historial': historial})
 
-
 def trabajador_login(request):
     """
     Vista para el inicio de sesión de trabajadores (vendedores y administradores).
@@ -135,14 +120,6 @@ def trabajador_login(request):
 
     return render(request, 'trabajadores/vendedor/trabajador_login.html', {'form': form})
 
-from django.shortcuts import render
-from Tienda.models import Cotizacion
-
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-from Tienda.models import Cotizacion
-
 def cotizaciones_pendientes(request):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
@@ -166,12 +143,6 @@ def cotizaciones_pendientes(request):
 
     context = {'cotizaciones': cotizaciones_datos}
     return render(request, 'Tienda/cotizaciones_pendientes.html', context)
-
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-from Tienda.models import Cotizacion
-import json
 
 @login_required
 def detalle_cotizacion(request, id):
@@ -207,12 +178,6 @@ def detalle_cotizacion(request, id):
     return render(request, 'trabajadores/vendedor/detalle_cotizacion.html', context)
 
 # Datos Gráficos
-
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q
-from django.utils.timezone import now, timedelta
-
 @login_required
 def datos_graficos(request):
     if not request.user.groups.filter(name='vendedores').exists():
@@ -276,13 +241,6 @@ def datos_graficos(request):
         },
     })
 
-
-
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-from django.db.models import Count, Q
-
 @login_required
 def estadisticas_ventas(request):
     if not request.user.groups.filter(name='vendedores').exists():
@@ -310,11 +268,6 @@ def estadisticas_ventas(request):
     }
 
     return render(request, 'trabajadores/vendedor/estadisticas_ventas.html', context)
-
-from django.http import JsonResponse
-from django.db.models import Sum
-from django.utils.timezone import now
-from datetime import timedelta
 
 @login_required
 def datos_valores(request):
