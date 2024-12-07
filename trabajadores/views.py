@@ -16,23 +16,35 @@ from django.contrib.auth.models import User
 
 
 # Dashboard del vendedor
+from django.db.models import Count
+
+from django.db.models import Count
+
 @login_required
 def vendedor_dashboard(request):
     if not request.user.groups.filter(name='vendedores').exists():
         return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
-    cotizaciones_entrantes = Cotizacion.objects.filter(estado='pendiente').count()
-    cotizaciones_resueltas = Cotizacion.objects.filter(estado='aceptada').count()
+    # Contar las cotizaciones pendientes
+    cotizaciones_pendientes = Cotizacion.objects.filter(estado='pendiente').count()
+
+    # Contar las cotizaciones resueltas (aceptadas o rechazadas)
+    cotizaciones_resueltas = Cotizacion.objects.filter(estado__in=['aceptada', 'rechazada']).count()
+
+    # Contar las cotizaciones rechazadas
     cotizaciones_rechazadas = Cotizacion.objects.filter(estado='rechazada').count()
-    total_ventas = Cotizacion.objects.filter(estado='aceptada').aggregate(total=Sum('total'))['total'] or 0
 
     context = {
-        'cotizaciones_entrantes': cotizaciones_entrantes,
+        'cotizaciones_pendientes': cotizaciones_pendientes,
         'cotizaciones_resueltas': cotizaciones_resueltas,
         'cotizaciones_rechazadas': cotizaciones_rechazadas,
-        'total_ventas': total_ventas,
     }
+
     return render(request, 'trabajadores/vendedor/dashboard_vendedor.html', context)
+
+
+
+
 
 # Revisar cotizaciones con datos reales
 @login_required
