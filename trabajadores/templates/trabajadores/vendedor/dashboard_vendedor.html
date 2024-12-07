@@ -85,11 +85,11 @@
     <div class="col-xl-6">
         <div class="card mb-4">
             <div class="card-header">
-                <i class="fas fa-chart-area me-1"></i>
+                <i class="fas fa-chart-bar me-1"></i>
                 Gráfico Semanal de Cotizaciones
             </div>
             <div class="card-body">
-                <canvas id="myAreaChart" width="100%" height="40"></canvas>
+                <canvas id="semanalChart" width="100%" height="40"></canvas>
             </div>
         </div>
     </div>
@@ -97,10 +97,10 @@
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-chart-bar me-1"></i>
-                Gráfico Mensual de Ventas
+                Gráfico Mensual de Cotizaciones
             </div>
             <div class="card-body">
-                <canvas id="myBarChart" width="100%" height="40"></canvas>
+                <canvas id="mensualChart" width="100%" height="40"></canvas>
             </div>
         </div>
     </div>
@@ -109,41 +109,79 @@
     fetch("{% url 'datos_graficos' %}")
         .then(response => response.json())
         .then(data => {
-            const ctxArea = document.getElementById('myAreaChart').getContext('2d');
-            const ctxBar = document.getElementById('myBarChart').getContext('2d');
+            const semanalCtx = document.getElementById('semanalChart').getContext('2d');
+            const mensualCtx = document.getElementById('mensualChart').getContext('2d');
 
             // Gráfico Semanal
-            if (data.semanales.data.length) {
-                new Chart(ctxArea, {
-                    type: 'line',
-                    data: {
-                        labels: data.semanales.labels,
-                        datasets: [{
-                            data: data.semanales.data,
-                            fill: true,
-                            borderColor: '#4bc0c0',
-                            backgroundColor: '#4bc0c030'
-                        }]
-                    }
-                });
-            }
+            new Chart(semanalCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.semanales.labels,
+                    datasets: [
+                        {
+                            label: 'Totales',
+                            data: data.semanales.totales,
+                            backgroundColor: '#007bff',
+                        },
+                        {
+                            label: 'Aceptadas',
+                            data: data.semanales.aceptadas,
+                            backgroundColor: '#28a745',
+                        },
+                        {
+                            label: 'Rechazadas',
+                            data: data.semanales.rechazadas,
+                            backgroundColor: '#dc3545',
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                    },
+                },
+            });
 
             // Gráfico Mensual
-            if (data.mensuales.data.length) {
-                new Chart(ctxBar, {
-                    type: 'bar',
-                    data: {
-                        labels: data.mensuales.labels,
-                        datasets: [{
-                            data: data.mensuales.data,
-                            backgroundColor: '#36a2eb',
-                        }]
-                    }
-                });
-            }
+            new Chart(mensualCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.mensuales.labels,
+                    datasets: [
+                        {
+                            label: 'Totales',
+                            data: data.mensuales.totales,
+                            backgroundColor: '#007bff',
+                        },
+                        {
+                            label: 'Aceptadas',
+                            data: data.mensuales.aceptadas,
+                            backgroundColor: '#28a745',
+                        },
+                        {
+                            label: 'Rechazadas',
+                            data: data.mensuales.rechazadas,
+                            backgroundColor: '#dc3545',
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                    },
+                },
+            });
         });
 </script>
+
 {% endblock %}
+
 
 {% block dataTables %}
 <div class="card mb-4">
@@ -219,6 +257,4 @@
         });
     });
 </script>
-
-
 {% endblock %}

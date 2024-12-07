@@ -3,13 +3,10 @@ from django.core.paginator import Paginator
 from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
-import random
-import string
 from .models import Shop,Clasificacion,Cotizacion
 from openpyxl import load_workbook
 from django.http import HttpResponse
 import os
-import uuid
 from django.db import transaction
 import json
 from django.core.exceptions import ObjectDoesNotExist

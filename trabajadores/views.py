@@ -109,34 +109,6 @@ def historial_cotizaciones(request):
     return render(request, 'trabajadores/vendedor/historial_cotizaciones.html', {'historial': historial})
 
 
-# Estadísticas de ventas
-@login_required
-def estadisticas_ventas(request):
-    if not request.user.groups.filter(name='vendedores').exists():
-        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
-
-    estadisticas = {
-        "total_ventas": Cotizacion.objects.filter(estado='aceptada').aggregate(total=Sum('total'))['total'] or 0,
-        "numero_cotizaciones": Cotizacion.objects.filter(estado='aceptada').count(),
-        "clientes_atendidos": Cotizacion.objects.values('cliente').distinct().count(),
-    }
-    return render(request, 'trabajadores/vendedor/estadisticas_ventas.html', {'estadisticas': estadisticas})
-
-# Datos para los gráficos
-@login_required
-def datos_graficos(request):
-    if not request.user.groups.filter(name='vendedores').exists():
-        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
-
-    cotizaciones_por_mes = Cotizacion.objects.filter(estado='aceptada').annotate(
-        mes=functions.TruncMonth('fecha')
-    ).values('mes').annotate(total=Sum('total')).order_by('mes')
-
-    labels = [str(c['mes']) for c in cotizaciones_por_mes]
-    data = [c['total'] for c in cotizaciones_por_mes]
-
-    return JsonResponse({'labels': labels, 'data': data})
-
 def trabajador_login(request):
     """
     Vista para el inicio de sesión de trabajadores (vendedores y administradores).
@@ -162,43 +134,6 @@ def trabajador_login(request):
         form = LoginForm()
 
     return render(request, 'trabajadores/vendedor/trabajador_login.html', {'form': form})
-
-@login_required
-def datos_graficos(request):
-    if not request.user.groups.filter(name='vendedores').exists():
-        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
-
-    # Gráfico semanal: cotizaciones de los últimos 7 días
-    fecha_actual = now()
-    ultimos_7_dias = fecha_actual - timedelta(days=7)
-    cotizaciones_semanales = (
-        Cotizacion.objects.filter(fecha__gte=ultimos_7_dias)
-        .annotate(dia=TruncDay('fecha'))
-        .values('dia')
-        .annotate(cantidad=Count('id'))
-        .order_by('dia')
-    )
-    labels_semanales = [cotizacion['dia'].strftime('%b %d') for cotizacion in cotizaciones_semanales]
-    data_semanales = [cotizacion['cantidad'] for cotizacion in cotizaciones_semanales]
-
-    # Gráfico mensual: ventas totales de los últimos 6 meses
-    ultimos_6_meses = fecha_actual - timedelta(days=180)
-    ventas_mensuales = (
-        Cotizacion.objects.filter(fecha__gte=ultimos_6_meses, estado='aceptada')
-        .annotate(mes=TruncMonth('fecha'))
-        .values('mes')
-        .annotate(total=Sum('total'))
-        .order_by('mes')
-    )
-    labels_mensuales = [venta['mes'].strftime('%B') for venta in ventas_mensuales]
-    data_mensuales = [venta['total'] for venta in ventas_mensuales]
-
-    return JsonResponse({
-        'semanales': {'labels': labels_semanales, 'data': data_semanales},
-        'mensuales': {'labels': labels_mensuales, 'data': data_mensuales},
-    })
-
-
 
 from django.shortcuts import render
 from Tienda.models import Cotizacion
@@ -271,3 +206,107 @@ def detalle_cotizacion(request, id):
 
     return render(request, 'trabajadores/vendedor/detalle_cotizacion.html', context)
 
+# Datos Gráficos
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
+from django.utils.timezone import now, timedelta
+
+@login_required
+def datos_graficos(request):
+    if not request.user.groups.filter(name='vendedores').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    # Gráfico Semanal: Cotizaciones Totales, Aceptadas y Rechazadas de la última semana (Lunes-Domingo)
+    fecha_actual = now()
+    inicio_semana = fecha_actual - timedelta(days=fecha_actual.weekday())  # Lunes actual
+    dias_semana = [inicio_semana + timedelta(days=i) for i in range(7)]  # Lunes a Domingo
+
+    semanales_totales = [
+        Cotizacion.objects.filter(fecha_creacion__date=dia).count()
+        for dia in dias_semana
+    ]
+    semanales_aceptadas = [
+        Cotizacion.objects.filter(fecha_creacion__date=dia, estado='aceptada').count()
+        for dia in dias_semana
+    ]
+    semanales_rechazadas = [
+        Cotizacion.objects.filter(fecha_creacion__date=dia, estado='rechazada').count()
+        for dia in dias_semana
+    ]
+    labels_semanales = [dia.strftime('%A') for dia in dias_semana]
+
+    # Gráfico Mensual: Cotizaciones Totales, Aceptadas y Rechazadas del mes en curso, separado por semanas
+    inicio_mes = fecha_actual.replace(day=1)
+    semanas_mes = [
+        (inicio_mes + timedelta(days=i * 7), inicio_mes + timedelta(days=(i + 1) * 7 - 1))
+        for i in range(5)  # Asumimos 5 semanas máximo en un mes
+    ]
+
+    mensuales_totales = [
+        Cotizacion.objects.filter(fecha_creacion__range=(inicio, fin)).count()
+        for inicio, fin in semanas_mes
+    ]
+    mensuales_aceptadas = [
+        Cotizacion.objects.filter(fecha_creacion__range=(inicio, fin), estado='aceptada').count()
+        for inicio, fin in semanas_mes
+    ]
+    mensuales_rechazadas = [
+        Cotizacion.objects.filter(fecha_creacion__range=(inicio, fin), estado='rechazada').count()
+        for inicio, fin in semanas_mes
+    ]
+    labels_mensuales = [
+        f"Semana {i+1}" for i in range(len(semanas_mes))
+    ]
+
+    # Devolver datos en JSON
+    return JsonResponse({
+        'semanales': {
+            'labels': labels_semanales,
+            'totales': semanales_totales,
+            'aceptadas': semanales_aceptadas,
+            'rechazadas': semanales_rechazadas,
+        },
+        'mensuales': {
+            'labels': labels_mensuales,
+            'totales': mensuales_totales,
+            'aceptadas': mensuales_aceptadas,
+            'rechazadas': mensuales_rechazadas,
+        },
+    })
+
+
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.db.models import Count, Q
+
+@login_required
+def estadisticas_ventas(request):
+    if not request.user.groups.filter(name='vendedores').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    # Cálculo de estadísticas
+    total_cotizaciones = Cotizacion.objects.count()
+    aceptadas = Cotizacion.objects.filter(estado='aceptada').count()
+    rechazadas = Cotizacion.objects.filter(estado='rechazada').count()
+    pendientes = Cotizacion.objects.filter(estado='pendiente').count()
+
+    # Calcular porcentajes
+    porcentaje_aceptadas = (aceptadas / total_cotizaciones) * 100 if total_cotizaciones > 0 else 0
+    porcentaje_rechazadas = (rechazadas / total_cotizaciones) * 100 if total_cotizaciones > 0 else 0
+    porcentaje_pendientes = (pendientes / total_cotizaciones) * 100 if total_cotizaciones > 0 else 0
+
+    context = {
+        'total_cotizaciones': total_cotizaciones,
+        'aceptadas': aceptadas,
+        'rechazadas': rechazadas,
+        'pendientes': pendientes,
+        'porcentaje_aceptadas': porcentaje_aceptadas,
+        'porcentaje_rechazadas': porcentaje_rechazadas,
+        'porcentaje_pendientes': porcentaje_pendientes,
+    }
+
+    return render(request, 'trabajadores/vendedor/estadisticas_ventas.html', context)
