@@ -60,7 +60,7 @@ class RegistrationForm(forms.ModelForm):
         password = self.cleaned_data.get("password")
 
         # Validar que la contraseña tenga exactamente 8 caracteres
-        if len(password) != 8:
+        if len(password) < 8:
             raise forms.ValidationError("La contraseña debe tener exactamente 8 caracteres.")
 
         # Validar que la contraseña contenga al menos una letra mayúscula

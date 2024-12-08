@@ -1,7 +1,7 @@
 {% extends 'Principal/base.html' %}
 {% load form_filters %}
 {% block content1 %}
-<div class="container py-5">
+<div class="container  align-items-center min-vh-100 py-5">
     <h2 class="mb-4 text-center">Registro</h2>
 
     <!-- Mostrar mensajes de error generales hola hola hola-->
@@ -30,6 +30,7 @@
             <div class="col-md-6">
                 <label for="id_email" class="form-label">Correo Electrónico</label>
                 {{ form.email|add_class:"form-control" }}
+                <small class="text-muted">El correo debe contener  @.</small>
                 {% if form.email.errors %}
                 <div class="text-danger small">
                     {% for error in form.email.errors %}
@@ -102,6 +103,7 @@
             <div class="col-md-6">
                 <label for="id_password" class="form-label">Contraseña</label>
                 {{ form.password|add_class:"form-control" }}
+                <small class="text-muted">La contraseña debe tener al menos 8 caracteres y una letra mayúscula.</small>
                 {% if form.password.errors %}
                 <div class="text-danger small">
                     {% for error in form.password.errors %}
