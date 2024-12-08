@@ -21,9 +21,9 @@
                                 <li><strong>Stock:</strong> {{ producto.stock }}</li>
                                 <li><strong>Created:</strong> {{ producto.created }}</li>
                             </ul>
-                            <form action="" method="GET">
-                                <button type="submit" class="btn btn-success btn-lg" name="submit" value="buy">Buy</button>
-                                <button type="submit" class="btn btn-success btn-lg" name="submit" value="addtocart">Add to Cart</button>
+                            <form action="{% url 'agregar_al_carrito' producto.id %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-lg">Add to Cart</button>
                             </form>
                         </div>
                     </div>

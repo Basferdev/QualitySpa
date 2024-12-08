@@ -23,7 +23,7 @@ class RegistrationForm(forms.ModelForm):
         'class': 'form-control',
         'placeholder': 'Ingrese su número de contacto'
     }), label="Número de Teléfono")
-    address = forms.CharField(widget=forms.Textarea(attrs={
+    address = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'placeholder': 'Ingrese su dirección'
     }), label="Dirección")
