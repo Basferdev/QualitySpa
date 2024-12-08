@@ -54,19 +54,6 @@ class Shop(models.Model):
     def __str__(self):
         return self.title
 
-    
-
-# class Cotizacion(models.Model):
-#     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-#     total = models.DecimalField(max_digits=10, decimal_places=2)
-#     cantidad_productos = models.IntegerField()
-#     cotizacion_id = models.CharField(max_length=100, unique=True)
-#     fecha_creacion = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"Cotización {self.cotizacion_id}"
-
-
 from django.core.validators import MinValueValidator
 
 class Cotizacion(models.Model):

@@ -22,17 +22,17 @@ def register(request):
                 user.last_name = form.cleaned_data['last_name']
                 user.save()
 
-                # Verificar si ya existe un perfil
-                if not hasattr(user, 'profile'):
-                    # Crear el perfil de usuario
-                    UserProfile.objects.create(
-                        user=user,
-                        phone_number=form.cleaned_data['phone_number'],
-                        address=form.cleaned_data['address'],
-                        postal_code=form.cleaned_data['postal_code'],
-                        first_name=form.cleaned_data['first_name'],
-                        last_name=form.cleaned_data['last_name']
-                    )
+                # Crear el perfil de usuario (asegurando que se llenen todos los campos)
+                UserProfile.objects.update_or_create(
+                    user=user,
+                    defaults={
+                        'phone_number': form.cleaned_data['phone_number'],
+                        'address': form.cleaned_data['address'],
+                        'postal_code': form.cleaned_data['postal_code'],
+                        'first_name': form.cleaned_data['first_name'],
+                        'last_name': form.cleaned_data['last_name'],
+                    }
+                )
 
                 # Asignar al grupo 'clientes'
                 group = Group.objects.get(name='clientes')
@@ -47,6 +47,7 @@ def register(request):
     else:
         form = RegistrationForm()
     return render(request, 'login/register.html', {'form': form})
+
 
 
 @login_required

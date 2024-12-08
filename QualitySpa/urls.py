@@ -36,8 +36,6 @@ urlpatterns = [
     path('datos_graficos/', viewsTrabajadores.datos_graficos, name='datos_graficos'),
     path('datos_valores/', viewsTrabajadores.datos_valores, name='datos_valores'),
 
-
-
     # Rutas de cotizaciones
     path('crear-cotizacion/', viewsArticulos.crear_cotizacion, name='crear_cotizacion'),
     path('descargar-cotizacion/<str:cotizacion_id>/', viewsArticulos.descargar_cotizacion_pdf, name='descargar_cotizacion'),

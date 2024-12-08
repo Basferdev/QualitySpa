@@ -121,67 +121,6 @@ def update_cart(request):
     total_productos = request.session.get('total_productos', 0)
     return JsonResponse({'total_productos': total_productos})
 
-# def crear_cotizacion(request):
-#     if request.method == 'POST':
-#         carrito = request.session.get('carrito', {})
-#         if not carrito:
-#             messages.error(request, "Tu carrito está vacío. No se puede generar una cotización.")
-#             return redirect('ver_carrito')
-
-#         total = 0
-#         cantidad_productos = 0
-#         cotizacion_id = generar_codigo_cotizacion()
-
-#         try:
-#             with transaction.atomic():
-#                 # Crear la cotización sin estado ni vendedor
-#                 cotizacion = Cotizacion(
-#                     usuario=request.user,
-#                     cotizacion_id=cotizacion_id,
-#                     total=0,  # Inicializamos en 0, se actualizará después
-#                     cantidad_productos=0,
-#                 )
-#                 cotizacion.save()
-
-#                 productos = []
-#                 for producto_id, detalles in carrito.items():
-#                     try:
-#                         producto = Shop.objects.get(id=producto_id)
-#                     except Shop.DoesNotExist:
-#                         messages.error(request, f"El producto con ID {producto_id} no existe.")
-#                         return redirect('ver_carrito')
-
-#                     cantidad = detalles['cantidad']
-#                     precio_unitario = producto.price
-#                     total += precio_unitario * cantidad
-#                     cantidad_productos += cantidad
-
-#                     # Agregar el producto a la lista de productos
-#                     productos.append({
-#                         'producto': producto.title,
-#                         'cantidad': cantidad,
-#                         'precio_unitario': precio_unitario
-#                     })
-
-#                 # Guardar los productos en formato JSON en la cotización
-#                 cotizacion.productos_json = json.dumps(productos)
-#                 cotizacion.total = total
-#                 cotizacion.cantidad_productos = cantidad_productos
-#                 cotizacion.save()
-
-#                 # Vaciar el carrito
-#                 request.session['carrito'] = {}
-#                 request.session['total_productos'] = 0
-
-#                 messages.success(request, "La cotización ha sido generada con éxito.")
-#                 return redirect('ver_carrito')
-
-#         except Exception as e:
-#             messages.error(request, f"Se produjo un error: {str(e)}")
-#             return redirect('ver_carrito')
-
-#     return redirect('ver_carrito')
-
 def agregar_al_carrito(request, producto_id):
     try:
         producto = Shop.objects.get(id=producto_id)
