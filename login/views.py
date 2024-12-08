@@ -48,8 +48,6 @@ def register(request):
         form = RegistrationForm()
     return render(request, 'login/register.html', {'form': form})
 
-
-
 @login_required
 def cliente_dashboard(request):
     # Verificar si el usuario pertenece al grupo "clientes"
@@ -63,12 +61,18 @@ def cliente_dashboard(request):
     total_cotizaciones = cotizaciones.count()
     total_gastado = cotizaciones.filter(estado='aceptada').aggregate(total=Sum('total'))['total'] or 0
 
+    # Calcular notificaciones sin leer
+    notificaciones_sin_leer = request.user.notificaciones.filter(leido=False).count()
+
     context = {
         'cotizaciones': cotizaciones,
         'total_cotizaciones': total_cotizaciones,
         'total_gastado': total_gastado,
+        'notificaciones_sin_leer': notificaciones_sin_leer,  # Añadir al contexto
     }
     return render(request, 'login/cliente_dashboard.html', context)
+
+
 
 @login_required
 def actualizar_perfil(request):
@@ -168,3 +172,13 @@ def user_login_trabajadores(request):
         form = LoginForm()
     return render(request, 'login/trabajador_login.html', {'form': form})
 
+@login_required
+def notificaciones(request):
+    if not request.user.groups.filter(name='clientes').exists():
+        return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+
+    # Obtener las notificaciones y marcarlas como leídas
+    notificaciones = request.user.notificaciones.order_by('-fecha_creacion')
+    notificaciones.update(leido=True)
+
+    return render(request, 'login/notificaciones.html', {'notificaciones': notificaciones})

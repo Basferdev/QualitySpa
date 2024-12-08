@@ -1,0 +1,16 @@
+{% extends 'Principal/base.html' %}
+{% block content1 %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Notificaciones</h2>
+    <ul class="list-group">
+        {% for notificacion in notificaciones %}
+            <li class="list-group-item {% if not notificacion.leido %}bg-light{% endif %}">
+                <p>{{ notificacion.mensaje }}</p>
+                <small class="text-muted">{{ notificacion.fecha_creacion|date:"d M Y, H:i" }}</small>
+            </li>
+        {% empty %}
+            <p class="text-center">No tienes notificaciones.</p>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

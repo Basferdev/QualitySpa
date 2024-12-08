@@ -13,7 +13,7 @@ from Tienda.models import Cotizacion
 import json
 from login.models import UserProfile
 from django.utils.timezone import now, timedelta
-
+from .models import Notificacion
 # Dashboard del vendedor
 @login_required
 def vendedor_dashboard(request):
@@ -56,8 +56,14 @@ def aprobar_cotizacion(request, id):
     cotizacion = get_object_or_404(Cotizacion, id=id)
     cotizacion.estado = 'aceptada'
     cotizacion.save()
+
+    # Crear notificación para el cliente
+    mensaje = f"Tu cotización #{cotizacion.id} ha sido aceptada."
+    Notificacion.objects.create(usuario=cotizacion.usuario, mensaje=mensaje)
+
     messages.success(request, "Cotización aprobada exitosamente.")
     return redirect('revisar_cotizaciones')
+
 
 @login_required
 def cotizaciones_resueltas(request):
@@ -75,8 +81,14 @@ def rechazar_cotizacion(request, id):
     cotizacion = get_object_or_404(Cotizacion, id=id)
     cotizacion.estado = 'rechazada'
     cotizacion.save()
+
+    # Crear notificación para el cliente
+    mensaje = f"Tu cotización #{cotizacion.id} ha sido rechazada."
+    Notificacion.objects.create(usuario=cotizacion.usuario, mensaje=mensaje)
+
     messages.success(request, "Cotización rechazada exitosamente.")
     return redirect('revisar_cotizaciones')
+
 
 @login_required
 def cotizaciones_rechazadas(request):

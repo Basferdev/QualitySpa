@@ -57,6 +57,8 @@ urlpatterns = [
 
     path('buscar/', views.buscar_productos, name='buscar_productos'),
 
+    path('notificaciones/', viewsLogin.notificaciones, name='notificaciones'),
+
     # Incluyendo rutas de la app login si es necesario
     path('login/', include('login.urls')),
 ]
